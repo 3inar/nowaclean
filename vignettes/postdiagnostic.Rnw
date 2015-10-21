@@ -1,0 +1,81 @@
+%\VignetteEngine{knitr::knitr}
+\documentclass{article}
+\usepackage{graphicx, verbatim}
+\usepackage[utf8]{inputenc}
+
+<<style-knitr, eval=TRUE, echo=FALSE, results="asis">>=
+BiocStyle::latex()
+@
+
+\begin{document}
+
+\bioctitle[nowaclean]{Cleaning the NOWAC postdiagnostic data set with
+  \Rpackage{nowaclean}}
+\author{Einar Holsbø\footnote{einar@cs.uit.no}}
+\maketitle
+
+\begin{abstract}
+This vignette describes the cleaning of the NOWAC postdiagnostic microarray data
+set with the \Rpackage{nowaclean} \R{} package, which implements the standard
+operating procedure for detecting and removing technical outliers in the NOWAC
+microarray data.
+\end{abstract}
+
+\section{Introduction}
+This vignette describes the data cleaning performed on the Norwegian Women and
+Cancer (NOWAC) postdiagnostic data set. The data cleaning process starts out
+with some preprocessing where we remove some uninformative probes and some
+samples where the controls have since gotten cancer (and can hence no longer be
+considered healthy controls). The main focus of this vignette is to show outlier
+removal and so we have placed this preprocessing in
+Appendix~\ref{appendix:preprocessing}. Section~\ref{section:package} briefly
+describes the \Rpackage{nowaclean} \R{} package and it's raison d'être.
+Section~\ref{section:outliers} describes the removal of technical outliers.
+A necessary step after outlier removal is background correction; this will not
+be described here.
+
+\subsection{Session info}
+<<session_info, echo=FALSE, results="asis">>=
+toLatex(sessionInfo())
+@
+
+
+\section{\Rpackage{nowaclean}}\label{section:package}
+\subsection{Installation and loading}
+Currently \Rpackage{nowaclean} is hosted only on
+GitHub.\footnote{\url{https://github.com}} To install from GitHub you need to install
+the \CRANpkg{devtools} package.
+<<devtools, eval=FALSE>>=
+install.packages("devtools", repos="http://cran.uib.no/")
+@
+
+Once you have installed \CRANpkg{devtools}, you can use it to install
+\Rpackage{nowaclean} from its GitHub repository.
+<<nowaclean_install, eval=FALSE>>=
+library(devtools)
+install_github("3inar/nowaclean")
+@
+By default \Rfunction{install\_github} doesnt build vignettes (such as the one
+you are reading); if you would like it to do so, you have to specify this in the
+function call:
+<<nowaclean_install_vign, eval=FALSE>>=
+install_github("3inar/nowaclean", build_vignettes=TRUE)
+@
+Once installed, you can use \Rpackage{nowaclean} like you would aby other \R{}
+package.
+<<nowaclean_load>>=
+library(nowaclean)
+@
+
+\section{Outlier Removal}\label{section:outliers}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% APPENDICES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+\section{Preprocessing}\label{appendix:preprocessing}
+<<remove_hist, eval=FALSE>>=
+print(5)
+@
+
+\end{document}
