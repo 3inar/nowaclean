@@ -46,7 +46,7 @@ Currently \Rpackage{nowaclean} is hosted only on
 GitHub.\footnote{\url{https://github.com}} To install from GitHub you need to install
 the \CRANpkg{devtools} package.
 <<devtools, eval=FALSE>>=
-install.packages("devtools", repos="http://cran.uib.no/")
+install.packages("devtools")
 @
 
 Once you have installed \CRANpkg{devtools}, you can use it to install
