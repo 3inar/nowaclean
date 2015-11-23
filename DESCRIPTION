@@ -10,4 +10,5 @@ License: MIT + file LICENSE
 LazyData: TRUE
 VignetteBuilder: knitr
 Suggests:
-  BiocStyle, knitr
+  BiocStyle,
+  knitr,

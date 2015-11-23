@@ -7,6 +7,10 @@
 BiocStyle::latex()
 @
 
+<<cache everything>>=
+knitr::opts_chunk$set(cache=TRUE)
+@
+
 \begin{document}
 
 \bioctitle[nowaclean]{Cleaning the NOWAC postdiagnostic data set with
@@ -60,6 +64,37 @@ package.
 <<nowaclean_load>>=
 library(nowaclean)
 @
+
+\section{Loading and Preprocessing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PREPROCESSING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+So now we load the dataset; we have suppressed the huge text dump that happens
+when you load the \Rpackage{lumi} package:
+<<load_data, message=FALSE>>=
+library(lumi)  # Required to access LumiBatch objects
+datapath <- "/project/data1/tice2/PostDiagnostic/GRC-244_postdiagnostic.RData"
+load(datapath)
+class(grc244)
+dim(grc244)
+
+# friendlier name
+data <- grc244 # p x n
+@
+The \Rcode{grc244} object is a \Rcode{LumiBatch} object that contains 47323
+probes for 868 samples.
+
+We'll now remove some probes to do with blood type that aren't especially
+interesting w.r.t cancer. The \Rfunction{blood\_probes} function returns the
+nuIDs of these probes.
+<<names and hist>>=
+histo_boolean <- !rownames(data) %in% blood_probes()
+data <- data[histo_boolean, ]
+
+# also extract gene expression matrix, transpose to get samples x probes
+expression <- t(exprs(data))
+@
+
 
 \section{Outlier Removal}\label{section:outliers}
 
