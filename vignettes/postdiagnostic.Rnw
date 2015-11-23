@@ -29,7 +29,7 @@ samples where the controls have since gotten cancer (and can hence no longer be
 considered healthy controls). The main focus of this vignette is to show outlier
 removal and so we have placed this preprocessing in
 Appendix~\ref{appendix:preprocessing}. Section~\ref{section:package} briefly
-describes the \Rpackage{nowaclean} \R{} package and it's raison d'être.
+describes the \Rpackage{nowaclean} \R{} package.
 Section~\ref{section:outliers} describes the removal of technical outliers.
 A necessary step after outlier removal is background correction; this will not
 be described here.
@@ -55,13 +55,7 @@ Once you have installed \CRANpkg{devtools}, you can use it to install
 library(devtools)
 install_github("3inar/nowaclean")
 @
-By default \Rfunction{install\_github} doesnt build vignettes (such as the one
-you are reading); if you would like it to do so, you have to specify this in the
-function call:
-<<nowaclean_install_vign, eval=FALSE>>=
-install_github("3inar/nowaclean", build_vignettes=TRUE)
-@
-Once installed, you can use \Rpackage{nowaclean} like you would aby other \R{}
+Once it is installed, you can use \Rpackage{nowaclean} like you would any other \R{}
 package.
 <<nowaclean_load>>=
 library(nowaclean)
