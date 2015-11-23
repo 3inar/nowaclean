@@ -7,7 +7,7 @@
 BiocStyle::latex()
 @
 
-<<cache everything>>=
+<<cache everything, include=FALSE>>=
 knitr::opts_chunk$set(cache=TRUE)
 @
 
