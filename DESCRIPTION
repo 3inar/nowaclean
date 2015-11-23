@@ -12,3 +12,4 @@ VignetteBuilder: knitr
 Suggests:
   BiocStyle,
   knitr,
+  lumi
