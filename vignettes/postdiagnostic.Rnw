@@ -30,13 +30,9 @@ This vignette describes the data cleaning performed on the Norwegian Women and
 Cancer (NOWAC) postdiagnostic data set. The data cleaning process starts out
 with some preprocessing where we remove some uninformative probes and some
 samples where the controls have since gotten cancer (and can hence no longer be
-considered healthy controls). The main focus of this vignette is to show outlier
-removal and so we have placed this preprocessing in
-Appendix~\ref{appendix:preprocessing}. Section~\ref{section:package} briefly
-describes the \Rpackage{nowaclean} \R{} package.
+considered healthy controls); this is shown in Section~\ref{section:preprocessing}.
+Section~\ref{section:package} briefly describes the \Rpackage{nowaclean} \R{} package.
 Section~\ref{section:outliers} describes the removal of technical outliers.
-A necessary step after outlier removal is background correction; this will not
-be described here.
 
 \subsection{Session info}
 <<session_info, echo=FALSE, results="asis">>=
@@ -65,7 +61,7 @@ package.
 library(nowaclean)
 @
 
-\section{Loading and Preprocessing}
+\section{Loading and Preprocessing}\label{section:preprocessing}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % PREPROCESSING
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -101,10 +97,13 @@ expression <- t(exprs(data))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % APPENDICES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\appendix
-\section{Preprocessing}\label{appendix:preprocessing}
-<<remove_hist, eval=FALSE>>=
-print(5)
-@
+% \appendix
+% \section{Loading data, background info}
+% \section{Preprocessing}\label{appendix:preprocessing}
+% This appendix covers some less interesting preprocessing. First we remove a set
+% of probes related to blood type that aren't interesting wrt cancer; the
+% \Rfunction{blood\_probes} function returns the NuIDs of these probes.
+% %<<remove_hist_echo, ref.label='remove_hist', eval=FALSE, echo=TRUE>>=
+% %@
 
 \end{document}
