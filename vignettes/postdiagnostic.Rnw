@@ -74,12 +74,15 @@ load(datapath)
 class(grc244)
 dim(grc244)
 
-# friendlier name
+# friendlier names
 data <- grc244 # p x n
+labInfo <- overview.data
+negCtrl <- negativeCtrls
 @
 The \Rcode{grc244} object is a \Rcode{LumiBatch} object that contains 47323
 probes for 868 samples.
 
+\subsection{Remove blood type probes}
 We'll now remove some probes to do with blood type that aren't especially
 interesting w.r.t cancer. The \Rfunction{blood\_probes} function returns the
 nuIDs of these probes.
@@ -87,10 +90,115 @@ nuIDs of these probes.
 histo_boolean <- !rownames(data) %in% blood_probes()
 data <- data[histo_boolean, ]
 
-# also extract gene expression matrix, transpose to get samples x probes
+# also extract gene expression matrix, transpose to get samples by probes
 expression <- t(exprs(data))
 @
 
+\subsection{Load background variables}
+Next up is to import background data such as case--control status and similar:
+<<load bg>>=
+bgpath <- "/project/data1/tice2/PostDiagnostic/postdiagnostic_background.csv"
+background <- read.csv2(bgpath, na.strings="")
+
+# I want the labnr, LPNR, match_labnr to be strings
+str(background[, 1:4])  # they anren't
+background$labnr <- as.character(background$labnr)
+background$match_labnr <- as.character(background$match_labnr)
+background$LPNR <- as.character(background$LPNR)
+
+# More useful row names:
+rownames(background) <- background$labnr
+
+#sort the background table same as gene expression matrix
+background_full <- background
+background <- background[sampleNames(data), ]
+@
+
+\subsection{Remove pairs where the control has cancer}
+There are two samples in the gene expression matrix that aren't in the background
+info table. There are also some samples that we have background info for that
+aren't in the gene expression matrix, but that is less interesting right now.
+<<missing samples>>=
+wrong <- which(!rownames(background) == sampleNames(data))
+cbind(rownames(background)[wrong], sampleNames(data)[wrong])
+missing_background <- sampleNames(data)[wrong]
+
+# Are there cases without controls or controls without cases in the bg table?
+unique(c(which(!background$labnr %in% background$match_labnr),
+       which(!background$match_labnr %in% background$labnr)))
+@
+
+Luckily all the cases have controls and vice versa in the background table. Also
+the two strange samples are most likely replicate samples (see below) so
+it shouldn't be any problem to remove them.
+
+<<replicates>>=
+missing_background
+replicates <- c(which(rownames(background) %in% c("102938", "103192")))
+background[replicates, 1:5]
+@
+
+We also want to remove case-control pairs where the control since has gotten cancer.
+You get this list from one of the people who deal with the cancer registry. These
+controls will be removed along with the cases they correspond to.
+
+<<subsetting>>=
+sick_controls <- unique(c("100069", "100999", "101148", "102688", "104043", "104186",
+                   "104872", "106508", "132668", "133111", "133383", "136514",
+                   "139281", "144168", "145025", "145405", "146667"))
+lone_cases <- background[sick_controls, "match_labnr"]
+
+remove <- unique(c(sick_controls, lone_cases, missing_background))
+
+# NB: We have an older version of R which means we have an older version of
+# bioconductor and hence an older v of lumi. This means that subsetting by
+# logical vector ruins lumibatch-objects. We'll do it by index instead.
+# This bug should be fixed  in lumi version 2.19.1 according to here:
+# https://support.bioconductor.org/p/65416/
+remove_index <- match(remove, sampleNames(data))
+data <- data[, -remove_index]
+background <- background[-remove_index, ]
+dim(data)
+dim(background)
+@
+
+\subsection{Imputation}
+The gene expression matrix contains some negative values, which first makes little
+biological sense and, second, will be a problem once we try to take logarithms of
+these values later. The consensus on the internet seems to be that negative gene
+expression values can sometimes happen and that it is most likely due to some
+correction procedure on the scanner level, i.e.\ long before we get the data.
+We will impute these values using the \Rfunction{knn.impute} from the
+\Biocpkg{impute} package.
+
+<<impute1>>=
+library(impute)  # from bioconductor
+expression <- exprs(data)
+impute_index = which(expression < 0, arr.ind=T)
+expression[impute_index] # there are three of them
+@
+The \Rfunction{impute.knn} function produces a lot of annoying debug output, which
+I have suppressed in this document.
+<<impute2, results="hide">>=
+expression[impute_index] <- NA # so that knn.impute knows what to impute
+expression_imputed <- impute.knn(expression)$data
+@
+
+Let's check whether the imputed values make sense:
+<<check_imputations>>=
+check <- cbind(original=exprs(data)[impute_index], imputed=expression_imputed[impute_index])
+check <- cbind(check, probe_minimum=apply(expression[rownames(impute_index), ], 1, min, na.rm=T))
+check
+@
+
+This is close enough considering that the gene expression values range from
+the order of  ten to the order of tens of thousands. We'll put the imputed gene
+expression matrix into the \Rcode{LumiBatch} object to replace the old one. This
+completes the preprocessing.
+<<replace expressions>>=
+exprs(data) <- expression_imputed
+any(exprs(data) < 0)
+@
 
 \section{Outlier Removal}\label{section:outliers}
 
