@@ -200,18 +200,54 @@ exprs(data) <- expression_imputed
 any(exprs(data) < 0)
 @
 
-\section{Outlier Removal}\label{section:outliers}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      OUTLIER REMOVAL
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% APPENDICES
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% \appendix
-% \section{Loading data, background info}
-% \section{Preprocessing}\label{appendix:preprocessing}
-% This appendix covers some less interesting preprocessing. First we remove a set
-% of probes related to blood type that aren't interesting wrt cancer; the
-% \Rfunction{blood\_probes} function returns the NuIDs of these probes.
-% %<<remove_hist_echo, ref.label='remove_hist', eval=FALSE, echo=TRUE>>=
-% %@
+\section{Outlier Removal}\label{section:outliers}
+The outlier detection process involves lots of exploratory plotting where we visualize
+clustering (dendrogram plots), spatial distribution (PCA), gene expression densities
+individual vs. median individual plots (sort of like a q-q plot).
+(TODO: bland-altman? MA plot? What's the difference?)
+
+We do outlier removal twice to be sure everyting looks well-behaved; let's just
+start on round one.
+
+%%% AQM NEEDED
+We'll look at a couple of summary plots. I'll time them for the sake of
+curiosity.
+<<initialQC>>=
+# The following line is afaik uninteresting and slow
+#system.time(dataQ <- lumiQ(data))  #initial QC with lumi. v slow
+
+# pooled probe intensities per sample. Hard to use with 800ish samples
+system.time(plot(data, what="density"))
+
+# MDS sample relation takes a long time and is probably risky to use due to
+# its trying to preserve distances between points & distance measures being notoriously
+# unreliable in higher dimensions (intuition completely breaks down around 10 dimensions)
+#system.time(plot(data, what="sampleRelation", method="mds"))   # MDS sample relation? Takes 12 minutes
+
+# dendrogram. slow but nice to look at. Same as 'dendrogram', but includes
+# a nice outlier line
+system.time(plot(data, what="outlier"))
+@
+
+As we can see, with over 800 samples, these plots can be difficult to read, we
+do however see that ther eis a handful of samples with strange probe intensity
+distributions, and that two samples are very far from the centre of our samples.
+Let's just move on and look at a PCA plot.
+
+<<PCA>>=
+# case-control mappings
+cases <- background[background$Case_ctrl == "case", ]$labnr
+controls <- background[cases,]$match_labnr
+l2expr <- log2(t(exprs(data))) # transpose for samples by probes
+diffl2expr <- l2expr[cases, ] - l2expr[controls, ]
+
+prc <- prcomp(l2expr)
+@
 
 \end{document}
