@@ -23,21 +23,25 @@ test_that("mahalanobis distances exist in $mahalanobis", {
   expect_true(all(dim(obj$mahalanobis)==c(nrow(testdata), nrow(testdata))))
 })
 
-test_that("logical $outliers vector in object", {
-  expect_is(obj$outliers, "logical")
-})
-
-test_that("prcout() detects some outliers", {
+test_that("predict() detects some outliers", {
   out <- prcout(outlierdata)
-  res <- out$outliers[1:nrow(outliers)]
+  res <- predict(out)[1:nrow(outliers)]
 
   expect_true(all(res))
 })
 
-test_that("prcout() takes a #sdevs argument for outlier threshold", {
-  out1 <- prcout(outlierdata)$outliers[1:nrow(outliers)]
-  out2 <- prcout(outlierdata, sdev=5)$outliers[1:nrow(outliers)]
+test_that("predict() takes optional #sdev argument for outlier threshold", {
+  object <- prcout(outlierdata)
+  out1 <- predict(object)[1:nrow(outliers)]
+  out2 <- predict(object, sdev=5)[1:nrow(outliers)]
 
   expect_true(all(out1))
-  expect_false(any(out2))
+  expect_false(all(out2))
+})
+
+test_that("prcout() takes optional 'prob' argument to define the mass of data", {
+  out1 <- predict(prcout(outlierdata))
+  out2 <- predict(prcout(outlierdata, prob=0.5))
+
+  expect_gt(sum(out2), sum(out1))
 })
