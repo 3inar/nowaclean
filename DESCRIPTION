@@ -1,7 +1,8 @@
 Package: nowaclean
 Type: Package
-Title: Methods for Standardized Data Cleaning in the Norwegian Women and Cancer Group.
-Version: 0.1.2
+Title: Methods for Standardized Data Cleaning in the Norwegian Women and Cancer
+    Group.
+Version: 0.1.3
 Date: 2015-10-12
 Author: Einar Holsbø <einar@cs.uit.no>
 Maintainer: Einar Holsbø <einar@cs.uit.no>
@@ -10,7 +11,8 @@ License: MIT + file LICENSE
 LazyData: TRUE
 VignetteBuilder: knitr
 Suggests:
-  BiocStyle,
-  knitr,
-  lumi,
-  testthat
+    BiocStyle,
+    knitr,
+    lumi,
+    testthat
+RoxygenNote: 5.0.1
