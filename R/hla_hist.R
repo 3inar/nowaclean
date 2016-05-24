@@ -1,8 +1,8 @@
 #' Blood type probes
 #'
-#' This function returns a list of blood type-related probes that we usually
-#' aren't interested in. Thy are usually strongly expressed and noninformativte
-#' w/r/t cancer. The function \code{blood_probes()} is a wrapper to this
+#' Returns a list of probes that cover HLA genes. These are usually strongly
+#' expressed and it may sometimes be desirable to remove them before
+#' analysis. The function \code{blood_probes()} is a wrapper to this
 #' function with a friendlier name.
 #'
 #' @return A character vector of nuIDs. If you for some reason want to
