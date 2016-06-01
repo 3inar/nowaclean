@@ -43,5 +43,5 @@ test_that("prcout() takes optional 'prob' argument to define the mass of data", 
   out1 <- predict(prcout(outlierdata))
   out2 <- predict(prcout(outlierdata, prob=0.5))
 
-  expect_gt(sum(out2), sum(out1))
+  expect_more_than(sum(out2), sum(out1))
 })
