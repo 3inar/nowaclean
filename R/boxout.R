@@ -14,7 +14,11 @@ boxout <- function(x) {
     whisker_u <- max(row[inner])
 
     # for outlier detection
-    kolmogs <- ks.test(row, pooledcdf)$statistic
+    # i don't care that I can't get exact p-values due to ties, I just
+    # want the statistic.
+    suppressWarnings(
+      kolmogs <- ks.test(row, pooledcdf)$statistic
+    )
     res <- c(whisker_l, quants, whisker_u, kolmogs)
     names(res) <- NULL
     res
@@ -28,11 +32,15 @@ boxout <- function(x) {
 }
 
 #' @export
-plot.boxout<- function(x) {
+plot.boxout<- function(x, orderv=NULL, ...) {
   quant <- x$statistics[, c("wl", "0.25", "0.5", "0.75", "wu")]
   kstats <- x$statistics[, "ks"]
   #quant <- quant[order(quant[, "0.5"]), ]
-  quant <- quant[order(kstats), ]
+  if (is.null(orderv)) {
+    quant <- quant[order(kstats), ]
+  } else {
+    quant <- quant[orderv, ]
+  }
   ymax <- max(quant)
   ymin <- min(quant)
 
@@ -43,6 +51,8 @@ plot.boxout<- function(x) {
   lines(quant[, "0.25"])
   lines(quant[, "0.75"])
   lines(quant[, "0.5"], lwd=2)
+
+  thresh <- abline(v=(length(kstats) - sum(predict(x, ...))), col="red")
 }
 
 #' @export
