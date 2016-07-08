@@ -1,4 +1,13 @@
-# samples by row
+#' Outlier detection and batch-effect investigation by boxplots
+#'
+#' Compared the empirical distribution function of each array's intensities
+#' to the (smoothed) ecdf of all arrays' intensities pooled. The comparison
+#' is done by the Kolmogorov--Smirnov statistic where we ignore the presence of
+#' ties.
+#'
+#' @param x A matrix of array intensities, samples by row.
+#'
+#' @return An object of class "boxout"
 #' @export
 boxout <- function(x) {
   obj <- list()
@@ -31,6 +40,17 @@ boxout <- function(x) {
   obj
 }
 
+#' Plot method for \code{boxout} objects
+#'
+#' Plot Karl Broman-style boxplots. By default orders them by KS-statistic
+#' (see \code{boxout} documentation) and shows a red line that indicates
+#' outlying arrays (see \code{predict.boxout} documenation).
+#'
+#' @param x an object of class \code{boxout}
+#' @param batch optional vector of batch labels for each array. If provided,
+#'  the arrays will be sorted by batch and the batches separated by grey lines.
+#' @param ... passed to predict(obj, ...) to label outliers
+#' @seealso \code{\link{boxout}}, \code{\link{predict.boxout}}
 #' @export
 plot.boxout<- function(x, batch=NULL, ...) {
   quant <- x$statistics[, c("wl", "0.25", "0.5", "0.75", "wu")]
@@ -63,6 +83,17 @@ plot.boxout<- function(x, batch=NULL, ...) {
 
 }
 
+#' Predict method for \code{boxout} objects
+#'
+#' Provides a prediction for whether an observation is a suspected outlier
+#'
+#' @param sdev Number of standard deviations (in KS statistic) that an
+#'  observation should be larger than the mean KS statistic in order to be
+#'  considered an outlier
+#'
+#' @return a logical vector indicating outlier Y/N as defined by the \code{sdev}
+#'  parameter.
+#'
 #' @export
 predict.boxout <- function(obj, sdev=2) {
   kst <- obj$statistics[, "ks"]
