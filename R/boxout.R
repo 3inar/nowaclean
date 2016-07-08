@@ -32,19 +32,28 @@ boxout <- function(x) {
 }
 
 #' @export
-plot.boxout<- function(x, orderv=NULL, ...) {
+plot.boxout<- function(x, batch=NULL, ...) {
   quant <- x$statistics[, c("wl", "0.25", "0.5", "0.75", "wu")]
   kstats <- x$statistics[, "ks"]
-  #quant <- quant[order(quant[, "0.5"]), ]
-  if (is.null(orderv)) {
+
+  if (is.null(batch)) {
     quant <- quant[order(kstats), ]
   } else {
-    quant <- quant[orderv, ]
+    batchorder <- order(batch)
+    quant <- quant[batchorder, ]
   }
+
   ymax <- max(quant)
   ymin <- min(quant)
 
   plot(quant[, "0.5"], type="n", ylim=c(ymin, ymax)) #, ...)
+
+  if (is.null(batch)) {
+    abline(v=(length(kstats) - sum(predict(x, ...))), col="red")
+  } else {
+    cuts <- which(!duplicated(batch[batchorder]))
+    abline(v=cuts[-1], col="gray") # 1st one uninformative
+  }
 
   lines(quant[, "wl"], lty="dashed")
   lines(quant[, "wu"], lty="dashed")
@@ -52,7 +61,6 @@ plot.boxout<- function(x, orderv=NULL, ...) {
   lines(quant[, "0.75"])
   lines(quant[, "0.5"], lwd=2)
 
-  thresh <- abline(v=(length(kstats) - sum(predict(x, ...))), col="red")
 }
 
 #' @export
