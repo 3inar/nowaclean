@@ -7,6 +7,8 @@
 \method{plot}{prcout}(obj, ...)
 }
 \arguments{
+\item{obj}{object of class \code{prcout}}
+
 \item{...}{passed to predict(obj, ...) to label outliers}
 }
 \description{

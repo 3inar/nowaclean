@@ -2,7 +2,7 @@
 % Please edit documentation in R/prcout.R
 \name{predict.prcout}
 \alias{predict.prcout}
-\title{Predict outliers}
+\title{Predict method for \code{prcout} objects}
 \usage{
 \method{predict}{prcout}(obj, sdev = 2)
 }

@@ -6,8 +6,8 @@
 #'
 #' @param x a numerical matrix with samples by row, measurements by column
 #' @param prob How unlikely should a data point at least be in order to not be
-#'  considered part of the "center mass" of the data. Translated to $k$ in
-#'  Chebyshev's inequality $P(|Z| \geq k) \leq 1/k^2$ and applied to the two
+#'  considered part of the "center mass" of the data. Translated to k in
+#'  Chebyshev's inequality P(|Z| >= k) =< 1/k^2 and applied to the two
 #'  first PCs.
 #'
 #' @return an object of class \code{prcout}. Can be plottet with plot(obj)
@@ -41,6 +41,7 @@ prcout <- function(x, prob=0.01) {
 #' to the mahalanobis distance to the data center (as defined by the inner mass
 #' of the data)
 #'
+#' @param obj object of class \code{prcout}
 #' @param ... passed to predict(obj, ...) to label outliers
 #' @seealso \code{\link{prcout}}, \code{\link{predict.prcout}}
 #' @export
@@ -60,7 +61,7 @@ plot.prcout <- function(obj, ...) {
   points(prc, col=ifelse(predict(obj, ...), "red", "black"))
 }
 
-#' Predict outliers
+#' Predict method for \code{prcout} objects
 #'
 #' Provides a prediction for whether an observation is a suspected outlier
 #'
