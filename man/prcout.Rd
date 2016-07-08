@@ -10,8 +10,8 @@ prcout(x, prob = 0.01)
 \item{x}{a numerical matrix with samples by row, measurements by column}
 
 \item{prob}{How unlikely should a data point at least be in order to not be
-considered part of the "center mass" of the data. Translated to $k$ in
-Chebyshev's inequality $P(|Z| \geq k) \leq 1/k^2$ and applied to the two
+considered part of the "center mass" of the data. Translated to k in
+Chebyshev's inequality P(|Z| >= k) =< 1/k^2 and applied to the two
 first PCs.}
 }
 \value{
