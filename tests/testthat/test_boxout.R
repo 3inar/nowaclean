@@ -19,6 +19,6 @@ test_that("whiskers should be mostly outside of iqr", {
   expect_true(all(s[, "wu"] >= s[, "0.75"]))
 })
 
-test_that("there is some sort of plot function for boxout()", {
-  plot(obj)
-})
+# test_that("there is some sort of plot function for boxout()", {
+#   plot(obj)
+# })
