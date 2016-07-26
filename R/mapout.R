@@ -45,7 +45,36 @@ predict.mapout <- function(obj, sdev=2) {
 }
 
 #' @export
-plot.mapout <- function(obj, sdev=2) {
-  worst <- order(obj$information, decreasing = T)[1]
-  plot(obj$A[worst,], obj$M[worst, ])
+plot.mapout <- function(obj, sdev=2, nout=1, lineup=F, subsample=T) {
+  nrows <- ifelse(lineup, 2, 1)
+  old.par <- par(mfrow=c(nrows,nout))
+
+  if (subsample) {
+    genes <- sample(1:ncol(obj$M), 2500)
+  } else {
+    genes <- 1:ncol(obj$M)
+  }
+
+  worst <- order(obj$information, decreasing = T)[1:nout]
+  randoms <- sample(1:nrow(obj$M), nout)
+
+  if (lineup) {
+    yrange <- range(obj$M[unique(c(worst, randoms)), ])
+  } else {
+    yrange <- range(obj$M[worst, ])
+  }
+
+  for (w in worst) {
+    plot(obj$A[w, genes], obj$M[w, genes], main=rownames(obj$M)[w], ylim=yrange)
+    abline(h=0, col="red")
+  }
+
+  if (lineup) {
+    for (w in randoms) {
+      plot(obj$A[w, genes], obj$M[w, genes], main="random sample", ylim=yrange)
+      abline(h=0, col="red")
+    }
+  }
+
+  par(old.par)
 }
