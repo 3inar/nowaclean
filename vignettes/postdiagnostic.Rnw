@@ -52,8 +52,7 @@ install.packages("devtools")
 Once you have installed \CRANpkg{devtools}, you can use it to install
 \Rpackage{nowaclean} from its GitHub repository.
 <<nowaclean_install, eval=FALSE>>=
-library(devtools)
-install_github("3inar/nowaclean")
+devtools::install_github("3inar/nowaclean")
 @
 Once it is installed, you can use \Rpackage{nowaclean} like you would any other \R{}
 package.
@@ -225,20 +224,18 @@ curiosity.
 # pooled probe intensities per sample. Hard to use with 800ish samples
 system.time(plot(data, what="density"))
 
-# MDS sample relation takes a long time and is probably risky to use due to
-# its trying to preserve distances between points & distance measures being notoriously
-# unreliable in higher dimensions (intuition completely breaks down around 10 dimensions)
-#system.time(plot(data, what="sampleRelation", method="mds"))   # MDS sample relation? Takes 12 minutes
-
 # dendrogram. slow but nice to look at. Same as 'dendrogram', but includes
 # a nice outlier line
-system.time(plot(data, what="outlier"))
+system.time(plot(data, what="outlier"))/60
 @
 
 As we can see, with over 800 samples, these plots can be difficult to read, we
 do however see that ther eis a handful of samples with strange probe intensity
 distributions, and that two samples are very far from the centre of our samples.
-Let's just move on and look at a PCA plot.
+Let's just move on and look at a PCA plots. The left panel shows all of the
+observations: cases and controls. The right panel shows $\log_2$ case--control
+fold change. The contour lines show distance to the center of the data in number
+of standard deviations.
 
 <<PCA>>=
 # case-control mappings
@@ -247,7 +244,127 @@ controls <- background[cases,]$match_labnr
 l2expr <- log2(t(exprs(data))) # transpose for samples by probes
 diffl2expr <- l2expr[cases, ] - l2expr[controls, ]
 
-prc <- prcomp(l2expr)
+prc_all <- prcout(l2expr)
+prc_diff <- prcout(diffl2expr)
+
+par(mfrow=c(1,2))
+plot(prc_all)
+plot(prc_diff)
 @
+
+The points marked in red are two standard deviations or more away from the
+main bulk of the data, at least the points that are above standard deviations
+away look very suspicious. Let's keep these red points as possible outliers.
+
+<<pcaoutliers>>=
+# predict() returns logical vectors of differing lenght,
+# it's __very__ important to translate these to sample names
+# so that you don't fool yourself later on.
+pca_outliers <- unique(
+  c(rownames(l2expr)[predict(prc_all, sdev=3)],
+  rownames(diffl2expr)[predict(prc_diff, sdev=3)])
+)
+pca_outliers
+@
+
+Next up, AQM
+<<AQMtest>>=
+library(arrayQualityMetrics) #TODO move this
+
+data2 <- data
+exprs(data2) <- expression_imputed
+eset <- as(data2, "ExpressionSetIllumina")
+class(eset)
+preparedData = prepdata(expressionset=eset, intgroup=c(), do.logtransform=TRUE)
+
+system.time(bo <- aqm.boxplot(preparedData))
+system.time(maplott <- aqm.maplot(preparedData))
+system.time(heat <- aqm.heatmap(preparedData))
+@
+
+The boxplot method is apparently very slow so we've made our own:
+<<boxplot_nowaclean>>=
+system.time(boxo <- boxout(l2expr))
+plot(boxo)
+@
+
+Points on the lines in this plot represent the box and whiskers of your regular
+\Rfunction{boxplot} function for your arrays. The lines represent the first and
+third quartiles, the median (viz the standard box), and the most extreme
+points that fall within 1.5 times the interquartile range (viz the standard whiskers).
+As default the arrays are sorted by size of ks statistic (distance to pooled empirical distribution
+function).The red line demarks the cutoff for outlier or not.
+
+We can order by batch-effect by passing a batch vector to the plot method:
+
+<<boxplot_batch>>=
+# batch by plate (possibly) setting rownames to have an easier time
+# getting the correct values in the correct order (subset by rowname)
+rownames(labInfo) <- labInfo$Sample_ID
+plateno <- labInfo[rownames(l2expr),]$Plate
+
+# how many plates are there
+length(unique(plateno))
+
+plot(boxo, batch=plateno)
+@
+
+There is a bit of a strange bump between the last two plates, let's see what
+happens if we look at $\log_2$ fold change instead:
+
+<<batch_diff>>=
+box_diff <- boxout(diffl2expr)
+
+plateno <- labInfo[rownames(diffl2expr),]$Plate
+
+plot(box_diff)
+plot(box_diff, batch=plateno)
+@
+
+The strange plate effect seems to disappear in this case. There are still some
+clear outliers. Let's get the flagged outliers from both of these.
+
+<<get_outliers_boxout>>=
+boxplot_outliers <- union(
+  rownames(l2expr)[predict(boxo, sdev=3)],
+  rownames(diffl2expr)[predict(box_diff, sdev=3)]
+)
+
+length(boxplot_outliers)
+@
+
+35 outliers is probably much too many based on what we saw in the pca plot,
+which just goes to show that you have be careful about automating this stuff too
+much.
+
+The final detection method we consider is the MA-plot. This was also slow enough
+in AQM that we decided to make our own. Let's plot the worst candidates (diverge the most from
+the horizontal line at 0) and compare to some random samples.
+<<maplot>>=
+system.time(maout <- mapout(l2expr))
+plot(maout, nout=5, lineup=T)
+
+mapoutliers <- rownames(l2expr)[predict(maout, sdev=3)]
+length(mapoutliers)
+@
+
+Let's now combine all outlier vectors.
+
+<<outlier_intersect>>=
+out_intersect <- union(mapoutliers, boxplot_outliers)
+length(out_intersect)
+
+out_dendrogram <- c("126897", "141068") # these were hard to read off the plot
+
+
+outliers <- unique(c(out_dendrogram, pca_outliers, out_intersect))
+outliers
+@
+
+<<>>=
+densities <- dens(l2expr)
+plot(densities, outliers=outliers)
+@
+
 
 \end{document}
