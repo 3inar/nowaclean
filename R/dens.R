@@ -15,8 +15,8 @@ plot.dens <- function(obj, outliers=NULL) {
   plot(NULL, type="n", xlim=xrange, ylim=yrange, ylab="Density", xlab="")
 
   if (!is.null(outliers)) {
-    out <- obj[names(obj) %in% out]
-    obj <- obj[!names(obj) %in% out]
+    out <- obj[names(obj) %in% outliers]
+    obj <- obj[!names(obj) %in% outliers]
 
   } else {
     out <- list()
