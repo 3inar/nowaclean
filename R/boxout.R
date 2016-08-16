@@ -95,7 +95,7 @@ plot.boxout<- function(x, batch=NULL, ...) {
 #'  parameter.
 #'
 #' @export
-predict.boxout <- function(obj, sdev=2) {
+predict.boxout <- function(obj, sdev=3) {
   kst <- obj$statistics[, "ks"]
   kst - mean(kst) > sdev*sd(kst)
 }
