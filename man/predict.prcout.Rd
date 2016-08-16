@@ -4,7 +4,7 @@
 \alias{predict.prcout}
 \title{Predict method for \code{prcout} objects}
 \usage{
-\method{predict}{prcout}(obj, sdev = 2)
+\method{predict}{prcout}(obj, sdev = 3)
 }
 \arguments{
 \item{sdev}{Number of standard deviations (in mahalanobis distance) that an

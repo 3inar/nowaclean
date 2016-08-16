@@ -48,7 +48,7 @@ mapout <- function(x) {
 }
 
 #' @export
-predict.mapout <- function(obj, sdev=2) {
+predict.mapout <- function(obj, sdev=3) {
   info <- obj$information
   info > mean(info) + sdev*sd(info)
 }

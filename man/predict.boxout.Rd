@@ -4,7 +4,7 @@
 \alias{predict.boxout}
 \title{Predict method for \code{boxout} objects}
 \usage{
-\method{predict}{boxout}(obj, sdev = 2)
+\method{predict}{boxout}(obj, sdev = 3)
 }
 \arguments{
 \item{sdev}{Number of standard deviations (in KS statistic) that an

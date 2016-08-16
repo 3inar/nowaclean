@@ -32,7 +32,8 @@ test_that("predict() detects some outliers", {
 
 test_that("predict() takes optional #sdev argument for outlier threshold", {
   object <- prcout(outlierdata)
-  out1 <- predict(object)[1:nrow(outliers)]
+  predict(object)[1:nrow(outliers)]
+  out1 <- predict(object, sdev=1)[1:nrow(outliers)]
   out2 <- predict(object, sdev=5)[1:nrow(outliers)]
 
   expect_true(all(out1))

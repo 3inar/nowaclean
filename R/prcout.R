@@ -72,7 +72,7 @@ plot.prcout <- function(obj, ...) {
 #'  parameter.
 #'
 #' @export
-predict.prcout <- function(obj, sdev=2) {
+predict.prcout <- function(obj, sdev=3) {
   obj$outliers <- obj$mahalanobis > sdev*obj$sd
 }
 
