@@ -10,6 +10,8 @@
 #' @return An object of class "boxout"
 #' @export
 boxout <- function(x) {
+  if (is.null(rownames(x))) stop("input x should have rownames")
+
   obj <- list()
   class(obj) <- "boxout"
 

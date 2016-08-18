@@ -1,6 +1,14 @@
 testdata <- matrix(c(rnorm(100*100, sd=2), rnorm(100*100, sd=5),
                   rnorm(100*100, sd=3), rnorm(100*100, sd=7)), nrow = 100)
+rownames(testdata) <- as.character(1:nrow(testdata))
 obj <- boxout(testdata)
+
+test_that("boxout() throws error if no rownames exist", {
+  d <- testdata
+  rownames(d) <- NULL
+
+  expect_error(boxout(d))
+})
 
 test_that("boxout() returns object of boxout class", {
   expect_is(obj, "boxout")
