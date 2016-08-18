@@ -8,15 +8,17 @@ dens <- function(expressions) {
 
 # NB col overrides outliers
 #' @export
-plot.dens <- function(obj, outliers=NULL) {
+plot.dens <- function(obj, highlight=NULL) {
   xrange <- range(plyr::laply(obj, function(o) {o$x}))
   yrange <- range(plyr::laply(obj, function(o) {o$y}))
 
   plot(NULL, type="n", xlim=xrange, ylim=yrange, ylab="Density", xlab="")
 
-  if (!is.null(outliers)) {
-    out <- obj[names(obj) %in% outliers]
-    obj <- obj[!names(obj) %in% outliers]
+  if (!is.null(highlight)) {
+    if (class(highlight) != "character") stop("highlight= should be character")
+
+    out <- obj[names(obj) %in% highlight]
+    obj <- obj[!names(obj) %in% highlight]
 
   } else {
     out <- list()
