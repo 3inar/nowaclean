@@ -45,7 +45,7 @@ prcout <- function(x, prob=0.01) {
 #' @param ... passed to predict(obj, ...) to label outliers
 #' @seealso \code{\link{prcout}}, \code{\link{predict.prcout}}
 #' @export
-plot.prcout <- function(obj, ...) {
+plot.prcout <- function(obj, highlight=NULL, ...) {
   prc <- obj$prc$x[, 1:2]
 
   # grid for contour lines
@@ -58,7 +58,14 @@ plot.prcout <- function(obj, ...) {
 
   # plot
   contour(s1, s2, mha/obj$sd, levels=1:6)
-  points(prc, col=ifelse(predict(obj, ...), "red", "black"))
+
+  if (is.null(highlight)) {
+    hset <- predict(obj, ...)
+  }  else {
+    hset <- highlight
+  }
+
+  points(prc, col=ifelse(rownames(prc) %in% hset, "red", "black"))
 }
 
 #' Predict method for \code{prcout} objects
@@ -73,6 +80,7 @@ plot.prcout <- function(obj, ...) {
 #'
 #' @export
 predict.prcout <- function(obj, sdev=3) {
-  obj$outliers <- obj$mahalanobis > sdev*obj$sd
+  rownames(obj$prc$x)[obj$mahalanobis > sdev*obj$sd]
+
 }
 
