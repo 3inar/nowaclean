@@ -1,6 +1,7 @@
 #' @export
-dens <- function(expressions) {
-  ret <- plyr::alply(expressions, 1, density, .dims=T)
+dens <- function(x) {
+  if (is.null(rownames(x))) stop("argument x should have rownames")
+  ret <- plyr::alply(x, 1, density, .dims=T)
   class(ret) <- "dens"
 
   ret
