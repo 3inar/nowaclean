@@ -10,7 +10,7 @@
 #'  Chebyshev's inequality P(|Z| >= k) =< 1/k^2 and applied to the two
 #'  first PCs.
 #'
-#' @return an object of class \code{prcout}. Can be plottet with plot(obj)
+#' @return an object of class \code{prcout}. Can be plotted with plot(obj)
 #'
 #' @export
 prcout <- function(x, prob=0.01) {
@@ -40,9 +40,11 @@ prcout <- function(x, prob=0.01) {
 #'
 #' Plots the two first PCs of the data with contour lines corresponding
 #' to the mahalanobis distance to the data center (as defined by the inner mass
-#' of the data)
+#' of the data). Highlights outliers or the samples defined in \code{highlight=}
 #'
 #' @param obj object of class \code{prcout}
+#' @param highlight optional character vector with names of samles to highlight in the plot.
+#'  Overrides the highlighting of outliers
 #' @param ... passed to predict(obj, ...) to label outliers
 #' @seealso \code{\link{prcout}}, \code{\link{predict.prcout}}
 #' @export
@@ -76,7 +78,7 @@ plot.prcout <- function(obj, highlight=NULL, ...) {
 #' @param sdev Number of standard deviations (in mahalanobis distance) that an
 #'  observation should be from the center to be called an outlier
 #'
-#' @return a logical vector indicating outlier Y/N as defined by the \code{sdev}
+#' @return a character vector of row names for the outliers as defined by the \code{sdev}
 #'  parameter.
 #'
 #' @export

@@ -11,7 +11,7 @@
 observation should be from the center to be called an outlier}
 }
 \value{
-a logical vector indicating outlier Y/N as defined by the \code{sdev}
+a character vector of row names for the outliers as defined by the \code{sdev}
  parameter.
 }
 \description{
