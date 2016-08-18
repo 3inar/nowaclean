@@ -2,7 +2,7 @@ Package: nowaclean
 Type: Package
 Title: Methods for Standardized Data Cleaning in the Norwegian Women and Cancer
     Group.
-Version: 0.1.7
+Version: 0.1.8
 Date: 2015-10-12
 Author: Einar Holsbø <einar@cs.uit.no>
 Maintainer: Einar Holsbø <einar@cs.uit.no>
