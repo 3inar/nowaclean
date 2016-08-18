@@ -8,9 +8,14 @@ y <- c(3*sdy, -3*sdy)
 x <- c(3*sdx, -3*sdx)
 outliers <- as.matrix(expand.grid(x,y))
 outlierdata <- rbind(outliers, testdata)
+rownames(outlierdata) <- as.character(1:nrow(outlierdata))
 
 test_that("method returns a prcout-object", {
   expect_is(obj, "prcout")
+})
+
+test_that("prcout() throws error if no rownames are provided", {
+  expect_error(prcout(cbind(rnorm(100, sd=2), rnorm(100, sd=5))))
 })
 
 test_that("return value contains a prcomp object in $prc", {

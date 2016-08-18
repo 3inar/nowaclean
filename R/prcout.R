@@ -14,6 +14,7 @@
 #'
 #' @export
 prcout <- function(x, prob=0.01) {
+  if (is.null(rownames(x))) stop("input x should have rownames")
   obj <- list()
   obj$prc <- prcomp(x)
 
