@@ -4,20 +4,22 @@
 \alias{plot.boxout}
 \title{Plot method for \code{boxout} objects}
 \usage{
-\method{plot}{boxout}(x, batch = NULL, ...)
+\method{plot}{boxout}(x, batch = NULL, highlight = NULL, ...)
 }
 \arguments{
 \item{x}{an object of class \code{boxout}}
 
 \item{batch}{optional vector of batch labels for each array. If provided,
-the arrays will be sorted by batch and the batches separated by grey lines.}
+the arrays will be sorted by batch and the batches separated by grey lines.
+@param highlight optional character vector of samples tot highlight with a
+  red line. Overrides the highlighting of first outlier.}
 
 \item{...}{passed to predict(obj, ...) to label outliers}
 }
 \description{
 Plot Karl Broman-style boxplots. By default orders them by KS-statistic
-(see \code{boxout} documentation) and shows a red line that indicates
-outlying arrays (see \code{predict.boxout} documenation).
+(see \code{boxout} documentation) and shows a red line that marks the
+first outlier (see \code{predict.boxout} documenation).
 }
 \seealso{
 \code{\link{boxout}}, \code{\link{predict.boxout}}

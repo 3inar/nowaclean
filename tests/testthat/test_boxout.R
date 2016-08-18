@@ -10,6 +10,13 @@ test_that("boxout() throws error if no rownames exist", {
   expect_error(boxout(d))
 })
 
+test_that("predict() returns character vector of rownames", {
+  ret <- predict(obj)
+
+  expect_is(ret, "character")
+  expect_true(all(ret %in% rownames(testdata)))
+})
+
 test_that("boxout() returns object of boxout class", {
   expect_is(obj, "boxout")
 })

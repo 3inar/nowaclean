@@ -45,16 +45,18 @@ boxout <- function(x) {
 #' Plot method for \code{boxout} objects
 #'
 #' Plot Karl Broman-style boxplots. By default orders them by KS-statistic
-#' (see \code{boxout} documentation) and shows a red line that indicates
-#' outlying arrays (see \code{predict.boxout} documenation).
+#' (see \code{boxout} documentation) and shows a red line that marks the
+#' first outlier (see \code{predict.boxout} documenation).
 #'
 #' @param x an object of class \code{boxout}
 #' @param batch optional vector of batch labels for each array. If provided,
 #'  the arrays will be sorted by batch and the batches separated by grey lines.
+#'  @param highlight optional character vector of samples to highlight with a
+#'    red line. Overrides the highlighting of first outlier.
 #' @param ... passed to predict(obj, ...) to label outliers
 #' @seealso \code{\link{boxout}}, \code{\link{predict.boxout}}
 #' @export
-plot.boxout<- function(x, batch=NULL, ...) {
+plot.boxout<- function(x, batch=NULL, highlight=NULL, ...) {
   quant <- x$statistics[, c("wl", "0.25", "0.5", "0.75", "wu")]
   kstats <- x$statistics[, "ks"]
 
@@ -70,12 +72,20 @@ plot.boxout<- function(x, batch=NULL, ...) {
 
   plot(quant[, "0.5"], type="n", ylim=c(ymin, ymax)) #, ...)
 
-  if (is.null(batch)) {
-    abline(v=(length(kstats) - sum(predict(x, ...))), col="red")
+  if (!is.null(highlight)) {
+    hli <- which(rownames(quant) %in% highlight)
+  } else if(is.null(batch)) {
+    hli <- (length(kstats) - length(predict(x, ...)))
   } else {
+    hli <- c()
+  }
+
+  if (!is.null(batch)) {
     cuts <- which(!duplicated(batch[batchorder]))
     abline(v=cuts[-1], col="gray") # 1st one uninformative
   }
+
+  abline(v=hli, col="red")
 
   lines(quant[, "wl"], lty="dashed")
   lines(quant[, "wu"], lty="dashed")
@@ -99,5 +109,5 @@ plot.boxout<- function(x, batch=NULL, ...) {
 #' @export
 predict.boxout <- function(obj, sdev=3) {
   kst <- obj$statistics[, "ks"]
-  kst - mean(kst) > sdev*sd(kst)
+  rownames(obj$statistics)[kst - mean(kst) > sdev*sd(kst)]
 }
