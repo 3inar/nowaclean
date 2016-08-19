@@ -1,6 +1,14 @@
 # testing mapout
 testdata <- matrix(c(rnorm(100*100, sd=2), rnorm(100*100, sd=5),
                   rnorm(100*100, sd=3), rnorm(100*100, sd=7)), nrow = 100)
+rownames(testdata) <- as.character(1:nrow(testdata))
+
+test_that("mapout() throws error if no rownames exist", {
+  d <- testdata
+  rownames(d) <- NULL
+
+  expect_error(mapout(d))
+})
 
 obj <- mapout(testdata)
 test_that("mapout() returns object of class mapout", {

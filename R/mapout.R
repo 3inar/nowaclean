@@ -1,5 +1,7 @@
 #' @export
 mapout <- function(x) {
+  if (is.null(rownames(x))) stop("input x should have rownames")
+
   obj <- list()
   class(obj) <- "mapout"
 
