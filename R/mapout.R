@@ -49,21 +49,22 @@ mapout <- function(x) {
 #' @export
 predict.mapout <- function(obj, sdev=3) {
   info <- obj$information
-  info > mean(info) + sdev*sd(info)
+  rownames(obj$M)[info > mean(info) + sdev*sd(info)]
 }
 
 #' @export
-plot.mapout <- function(obj, nout=1, which=NULL, lineup=F, subsample=T,
-                        ncol=ifelse(is.null(which), nout, length(which))) {
+plot.mapout <- function(obj, nout=1, highlight=NULL, lineup=F, subsample=T,
+                        ncol=ifelse(is.null(highlight), nout, length(highlight))) {
 
-  if (is.null(which)) nplots <- ifelse(lineup, 2*nout, nout)
-  else nplots <- length(which)
+  if (is.null(highlight)) nplots <- ifelse(lineup, 2*nout, nout)
+  else nplots <- length(highlight)
   nrows <- ceiling(nplots/ncol)
 
-  old.par <- par(mfrow=c(nrows,ncol))
+  if (nplots > 1) old.par <- par(mfrow=c(nrows,ncol))
 
   if (subsample) {
-    genes <- sample(1:ncol(obj$M), 2500)
+    nsub <- ceiling(ncol(obj$M))/10
+    genes <- sample(1:ncol(obj$M), ifelse(nsub < 2500, nsub, 2500))
   } else {
     genes <- 1:ncol(obj$M)
   }
@@ -71,8 +72,8 @@ plot.mapout <- function(obj, nout=1, which=NULL, lineup=F, subsample=T,
   yrange <- range(obj$M)
   xrange <- range(obj$A)
 
-  if (is.null(which)) {
-    worst <- order(obj$information, decreasing = T)[1:nout]
+  if (is.null(highlight)) {
+    worst <- rownames(obj$M)[order(obj$information, decreasing = T)[1:nout]]
     randoms <- sample(1:nrow(obj$M), nout)
 
     for (w in worst) {
@@ -85,12 +86,12 @@ plot.mapout <- function(obj, nout=1, which=NULL, lineup=F, subsample=T,
       }
     }
   } else {
-    for (w in which) {
+    for (w in highlight) {
       single_plot(obj, w, genes, xrange, yrange, spline=T)
     }
   }
 
-  par(old.par)
+  if (nplots > 1) par(old.par)
 }
 
 fullreport <- function(obj, perpage=20, subsample=T) {
@@ -105,7 +106,7 @@ fullreport <- function(obj, perpage=20, subsample=T) {
   pdf(file="report.pdf", width=8.3, height=11.7, onefile=T)
   par(omi = rep(.5, 4))                      ## 1/2 inch outer margins
   plyr::l_ply(pages, function(candidates) {
-    plot(obj, which=candidates, ncol=4, subsample=subsample)
+    plot(obj, highlight=candidates, ncol=4, subsample=subsample)
   })
   dev.off()
 }
@@ -116,11 +117,11 @@ outlierplot <- function(obj, sdev=2, ncol=5, subsample=T) {
   worst <- which(outliers)
   worst <- worst[order(obj$information[outliers], decreasing = T)]
 
-  plot(obj, which=worst, ncol=ncol, subsample=subsample)
+  plot(obj, highlight=worst, ncol=ncol, subsample=subsample)
 }
 
-single_plot <- function(obj, index, genes, xrange, yrange, spline=F, rs=F) {
-  w <- index
+single_plot <- function(obj, samplename, genes, xrange, yrange, spline=F, rs=F) {
+  w <- which(rownames(obj$M)==samplename)
 
   title <- rownames(obj$M)[w]
   if (rs) title <- paste0(title, " (random)")
