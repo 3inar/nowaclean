@@ -11,7 +11,7 @@
 
 \item{batch}{optional vector of batch labels for each array. If provided,
 the arrays will be sorted by batch and the batches separated by grey lines.
-@param highlight optional character vector of samples tot highlight with a
+@param highlight optional character vector of samples to highlight with a
   red line. Overrides the highlighting of first outlier.}
 
 \item{...}{passed to predict(obj, ...) to label outliers}
