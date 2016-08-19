@@ -17,13 +17,9 @@ mapout <- function(x) {
     (array + obj$median_array)/2
   })
 
-  # binner <- nclass.FD
-  # nba <- binner(obj$A)
-  # nbm <- binner(obj$M)
-
+  # discretization granularity
   nba <- 200
   nbm <- 200
-
 
   ra <- range(obj$A)
   rm <- range(obj$M)
