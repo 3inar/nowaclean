@@ -1,3 +1,4 @@
+# NB assumes log transformed
 #' @export
 mapout <- function(x) {
   if (is.null(rownames(x))) stop("input x should have rownames")
