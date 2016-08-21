@@ -40,15 +40,19 @@ prcout <- function(x, prob=0.01) {
 #'
 #' Plots the two first PCs of the data with contour lines corresponding
 #' to the mahalanobis distance to the data center (as defined by the inner mass
-#' of the data). Highlights outliers or the samples defined in \code{highlight=}
+#' of the data). Highlights outliers or the samples defined in \code{highlight=}.
+#' Alternately colors points by batch if the \code{batch} parameter is defined
 #'
 #' @param obj object of class \code{prcout}
+#' @param batch optional vector that indicates which bach a sample belogs to.
+#'  Points will be colored by batch if this vector is provided. Overrides
+#'  \code{highlight=}
 #' @param highlight optional character vector with names of samles to highlight in the plot.
 #'  Overrides the highlighting of outliers
 #' @param ... passed to predict(obj, ...) to label outliers
 #' @seealso \code{\link{prcout}}, \code{\link{predict.prcout}}
 #' @export
-plot.prcout <- function(obj, highlight=NULL, ...) {
+plot.prcout <- function(obj, batch=NULL, highlight=NULL, ...) {
   prc <- obj$prc$x[, 1:2]
 
   # grid for contour lines
@@ -68,7 +72,19 @@ plot.prcout <- function(obj, highlight=NULL, ...) {
     hset <- highlight
   }
 
-  points(prc, col=ifelse(rownames(prc) %in% hset, "red", "black"))
+  if (!is.null(batch)) {
+    colv <- RColorBrewer::brewer.pal(12, "Set3")
+    batch <- as.numeric(as.factor(batch))
+    if (max(batch) > 12) {  # if more than 12 colors, recycle
+      batch <- ((batch - 1) %% 12) + 1
+    }
+    colors <- colv[batch]
+  }  else {
+    colors <- rep("black", nrow(prc))
+    colors[rownames(prc) %in% hset] <- "red"
+  }
+
+  points(prc, col=colors, pch=20)
 }
 
 #' Predict method for \code{prcout} objects
