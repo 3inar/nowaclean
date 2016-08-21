@@ -4,10 +4,14 @@
 \alias{plot.prcout}
 \title{Plot method for \code{prcout} objects}
 \usage{
-\method{plot}{prcout}(obj, highlight = NULL, ...)
+\method{plot}{prcout}(obj, batch = NULL, highlight = NULL, ...)
 }
 \arguments{
 \item{obj}{object of class \code{prcout}}
+
+\item{batch}{optional vector that indicates which bach a sample belogs to.
+Points will be colored by batch if this vector is provided. Overrides
+\code{highlight=}}
 
 \item{highlight}{optional character vector with names of samles to highlight in the plot.
 Overrides the highlighting of outliers}
@@ -17,7 +21,8 @@ Overrides the highlighting of outliers}
 \description{
 Plots the two first PCs of the data with contour lines corresponding
 to the mahalanobis distance to the data center (as defined by the inner mass
-of the data). Highlights outliers or the samples defined in \code{highlight=}
+of the data). Highlights outliers or the samples defined in \code{highlight=}.
+Alternately colors points by batch if the \code{batch} parameter is defined
 }
 \seealso{
 \code{\link{prcout}}, \code{\link{predict.prcout}}

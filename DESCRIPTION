@@ -11,7 +11,7 @@ License: MIT + file LICENSE
 LazyData: TRUE
 VignetteBuilder: knitr
 Imports:
-    plyr, entropy
+    plyr, entropy, RColorBrewer
 Suggests:
     BiocStyle,
     knitr,
