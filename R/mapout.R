@@ -57,7 +57,7 @@ plot.mapout <- function(obj, nout=1, highlight=NULL, lineup=F, subsample=T,
                         ncol=ifelse(is.null(highlight), nout, length(highlight))) {
 
   if (is.null(highlight)) nplots <- ifelse(lineup, 2*nout, nout)
-  else nplots <- length(highlight)
+  else nplots <- nplots <- ifelse(lineup, 2*length(highlight), length(highlight))
   nrows <- ceiling(nplots/ncol)
 
   if (nplots > 1) old.par <- par(mfrow=c(nrows,ncol))
@@ -71,23 +71,24 @@ plot.mapout <- function(obj, nout=1, highlight=NULL, lineup=F, subsample=T,
 
   yrange <- range(obj$M)
   xrange <- range(obj$A)
+  randoms <- sample(rownames(obj$M), nplots/2)
 
   if (is.null(highlight)) {
     worst <- rownames(obj$M)[order(obj$information, decreasing = T)[1:nout]]
-    randoms <- sample(rownames(obj$M), nout)
 
     for (w in worst) {
       single_plot(obj, w, genes, xrange, yrange, spline=T)
     }
 
-    if (lineup) {
-      for (w in randoms) {
-        single_plot(obj, w, genes, xrange, yrange, spline=T, rs=T)
-      }
-    }
   } else {
     for (w in highlight) {
       single_plot(obj, w, genes, xrange, yrange, spline=T)
+    }
+  }
+
+  if (lineup) {
+    for (w in randoms) {
+      single_plot(obj, w, genes, xrange, yrange, spline=T, rs=T)
     }
   }
 
