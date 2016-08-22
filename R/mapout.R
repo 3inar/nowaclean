@@ -74,7 +74,7 @@ plot.mapout <- function(obj, nout=1, highlight=NULL, lineup=F, subsample=T,
 
   if (is.null(highlight)) {
     worst <- rownames(obj$M)[order(obj$information, decreasing = T)[1:nout]]
-    randoms <- sample(1:nrow(obj$M), nout)
+    randoms <- sample(rownames(obj$M), nout)
 
     for (w in worst) {
       single_plot(obj, w, genes, xrange, yrange, spline=T)
