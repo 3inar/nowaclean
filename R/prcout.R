@@ -79,12 +79,13 @@ plot.prcout <- function(obj, batch=NULL, highlight=NULL, ...) {
       batch <- ((batch - 1) %% 12) + 1
     }
     colors <- colv[batch]
+    points(prc, col=colors, pch=20)
   }  else {
     colors <- rep("black", nrow(prc))
     colors[rownames(prc) %in% hset] <- "red"
+    points(prc[order(colors), ], col=colors[order(colors)], pch=20)
   }
 
-  points(prc, col=colors, pch=20)
 }
 
 #' Predict method for \code{prcout} objects
