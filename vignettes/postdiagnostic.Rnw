@@ -32,7 +32,9 @@ with some preprocessing where we remove some uninformative probes and some
 samples where the controls have since gotten cancer (and can hence no longer be
 considered healthy controls); this is shown in Section~\ref{section:preprocessing}.
 Section~\ref{section:package} briefly describes the \Rpackage{nowaclean} \R{} package.
-Section~\ref{section:outliers} describes the removal of technical outliers.
+Section~\ref{section:outliers} describes the detection of technical outliers,
+while Section~\ref{section:removal} describes the evaluation and, as needed, the
+removal of the detected outliers.
 
 \subsection{Session info}
 <<session_info, echo=FALSE, results="asis">>=
@@ -82,6 +84,7 @@ The \Rcode{grc244} object is a \Rcode{LumiBatch} object that contains 47323
 probes for 868 samples.
 
 \subsection{Remove blood type probes}
+TODO: the following is lies
 We'll now remove some probes to do with blood type that aren't especially
 interesting w.r.t cancer. The \Rfunction{blood\_probes} function returns the
 nuIDs of these probes.
@@ -205,7 +208,7 @@ any(exprs(data) < 0)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Outlier Removal}\label{section:outliers}
+\section{Outlier detection}\label{section:outliers}
 The outlier detection process involves lots of exploratory plotting where we visualize
 clustering (dendrogram plots), spatial distribution (PCA), gene expression densities
 individual vs. median individual plots (sort of like a q-q plot).
@@ -226,7 +229,7 @@ system.time(plot(data, what="density"))
 
 # dendrogram. slow but nice to look at. Same as 'dendrogram', but includes
 # a nice outlier line
-system.time(plot(data, what="outlier"))/60
+system.time(plot(data, what="outlier"))
 @
 
 As we can see, with over 800 samples, these plots can be difficult to read, we
@@ -257,13 +260,7 @@ main bulk of the data, at least the points that are above standard deviations
 away look very suspicious. Let's keep these red points as possible outliers.
 
 <<pcaoutliers>>=
-# predict() returns logical vectors of differing lenght,
-# it's __very__ important to translate these to sample names
-# so that you don't fool yourself later on.
-pca_outliers <- unique(
-  c(rownames(l2expr)[predict(prc_all, sdev=3)],
-  rownames(diffl2expr)[predict(prc_diff, sdev=3)])
-)
+pca_outliers <- union(predict(prc_all, sdev=3), predict(prc_diff, sdev=3))
 pca_outliers
 @
 
@@ -298,7 +295,7 @@ function).The red line demarks the cutoff for outlier or not.
 We can order by batch-effect by passing a batch vector to the plot method:
 
 <<boxplot_batch>>=
-# batch by plate (possibly) setting rownames to have an easier time
+# batch by plate; setting rownames to have an easier time
 # getting the correct values in the correct order (subset by rowname)
 rownames(labInfo) <- labInfo$Sample_ID
 plateno <- labInfo[rownames(l2expr),]$Plate
@@ -315,21 +312,17 @@ happens if we look at $\log_2$ fold change instead:
 <<batch_diff>>=
 box_diff <- boxout(diffl2expr)
 
-plateno <- labInfo[rownames(diffl2expr),]$Plate
+plateno_diff <- labInfo[rownames(diffl2expr),]$Plate
 
 plot(box_diff)
-plot(box_diff, batch=plateno)
+plot(box_diff, batch=plateno_diff)
 @
 
 The strange plate effect seems to disappear in this case. There are still some
 clear outliers. Let's get the flagged outliers from both of these.
 
 <<get_outliers_boxout>>=
-boxplot_outliers <- union(
-  rownames(l2expr)[predict(boxo, sdev=3)],
-  rownames(diffl2expr)[predict(box_diff, sdev=3)]
-)
-
+boxplot_outliers <- union(predict(boxo, sdev=3), predict(box_diff, sdev=3))
 length(boxplot_outliers)
 @
 
@@ -344,27 +337,369 @@ the horizontal line at 0) and compare to some random samples.
 system.time(maout <- mapout(l2expr))
 plot(maout, nout=5, lineup=T)
 
-mapoutliers <- rownames(l2expr)[predict(maout, sdev=3)]
+mapoutliers <- predict(maout, sdev=3)
 length(mapoutliers)
 @
 
 Let's now combine all outlier vectors.
 
 <<outlier_intersect>>=
-out_intersect <- union(mapoutliers, boxplot_outliers)
-length(out_intersect)
+out_union <- union(mapoutliers, boxplot_outliers)
+length(out_union)
 
 out_dendrogram <- c("126897", "141068") # these were hard to read off the plot
 
 
-outliers <- unique(c(out_dendrogram, pca_outliers, out_intersect))
+outliers <- unique(c(out_dendrogram, pca_outliers, out_union))
+
+# should be "126897" "141068" "131191" "140362" "101561"
+# "139983" "147050" "146811" "141975" "141965"
 outliers
 @
 
-<<>>=
+This is the densities of expression values for all samples, proposed outliers in
+red:
+<<densplot>>=
 densities <- dens(l2expr)
-plot(densities, outliers=outliers)
+plot(densities, highlight=outliers)
+@
+
+As we can see, all of the clearly strange densities in this plot are marked as outliers;
+some of the suggested outliers don't look too bad in this plot however.
+
+\section{Outlier removal}\label{section:removal}
+So now we have a list of \Sexpr{length(outliers)} potential outliers that we
+suspect are technical outliers. This section will examine each of them and
+we'll make a decision to either keep or remove them as need be. Note that I
+use the actual sample names instead of for eg \Rcode{outliers\[1\]}, this to
+be absolutely certain that I'm looking at what I think I'm looking at.
+
+\subsection{126897}
+This sample clearly looks strange in all the plots; I'll remove it. It's also
+one of the two very strange samples from the tree plot earlier.
+<<outl1>>=
+highlight("126897", pca=prc_all, box=boxo, dens=densities, ma=maout)
+for_removal <- "126897"
+@
+
+\subsection{141068}
+This is the other sample from the tree plot. This one is alos so clearly
+stranger than the rest that I can't defend keeping it.
+<<outl2>>=
+highlight("141068", pca=prc_all, box=boxo, dens=densities, ma=maout)
+for_removal <- c(for_removal, "141068")
+@
+
+\subsection{131191}
+<<outl3>>=
+highlight("131191", pca=prc_all, box=boxo, dens=densities, ma=maout)
+@
+This one looks strange in most the plots, though not as strange as the others
+in the MA-plot. If we look at the distribution of mutual information in our data,
+however, we see that it's pretty far out there:
+<<histout3>>=
+hist(maout$information)
+abline(v=1, col="red")
+for_removal <- c(for_removal, "131191")
+@
+
+\subsection{140362}
+Another clear anomaly. Although not too bad in terms of mutual information, its
+distribution is clearly skewed and it's many standard deviations away from the rest of the data
+when we inspect the PCA plot.
+<<outl4>>=
+highlight("140362", pca=prc_all, box=boxo, dens=densities, ma=maout)
+for_removal <- c(for_removal, "140362")
+@
+
+\subsection{101561}
+<<outl5>>=
+highlight("101561", pca=prc_all, box=boxo, dens=densities, ma=maout)
+@
+This one is more interesting. It looks fairly normal in most the plots. I suspect
+that it was flagged as outlier due to its slightly higher mutual information statistic,
+something the below histogram seems to confirm.
+<<hist0utl5>>=
+hist(maout$information)
+abline(v=0.61, col="red")
+@
+
+Let's look at its MA-plot next to a random sample:
+<<maplot5>>=
+set.seed(22082016)
+plot(maout, highlight="101561", lineup=T)
+@
+
+There is some slight deviation from independence in M and A, the random sample
+is fairly average (cf. above histogram). It's hard to say that this is a
+technical outlier based on this evidence. In such cases we can look at
+the lab measures:
+<<labmeasures5>>=
+labInfo["101561", lab_variables]
+
+# holds lab thresholds
+lab_thresholds
+@
+
+As we can see, several of the lab measures are outside their recommended
+thresholds, so we'll remove this sample as well.
+<<remove5>>=
+for_removal <- c(for_removal, "101561")
 @
 
 
+\subsection{139983}
+<<highlight6>>=
+highlight("139983", pca=prc_all, box=boxo, dens=densities, ma=maout)
+@
+
+This one seems also to be here mostly because of its MI-statistic; we'll look
+at it next to a random sample again, and inspect the lab values
+<<rando6>>=
+plot(maout, highlight="139983", lineup=T)
+
+labInfo["139983", lab_variables]
+lab_thresholds
+@
+
+Again there is reason to exclude this one based on its lab values.
+<<remove6>>=
+for_removal <- c(for_removal, "139983")
+@
+
+\subsection{147050}
+<<hihglight7>>=
+highlight("147050", pca=prc_all, box=boxo, dens=densities, ma=maout)
+@
+
+This time we're looking at an exemplary MA-plot, but the KS-statistic from the
+boxplot is pretty bad, and the density seems also to be somewhat skewed. Let's
+compare the KS-statistic of 147050 to the others':
+<<hist7>>=
+hist(boxo$statistics[, "ks"], nclass=30)
+abline(v=boxo$statistics["147050", "ks"], col="red")
+@
+
+Clearly it's kind of far out here; the lab measures again suggest that this
+sample has something funny about it:
+<<lab>>=
+labInfo["147050", lab_variables]
+lab_thresholds
+
+for_removal <- c(for_removal, "147050")
+@
+
+\subsection{146811}
+<<highlight8>>=
+highlight("146811", pca=prc_all, box=boxo, dens=densities, ma=maout)
+@
+
+This one is looking pretty similar to the previous one;
+we can look at its KS-statistic and its lab measures to be sure.
+<<eval8>>=
+hist(boxo$statistics[, "ks"], nclass=30)
+abline(v=boxo$statistics["146811", "ks"], col="red")
+
+labInfo["147050", lab_variables]
+lab_thresholds
+@
+
+Again it's probably safe to remove this.
+<<rem8>>=
+for_removal <- c(for_removal, "146811")
+@
+
+\subsection{141975}
+<<high9>>=
+highlight("141975", pca=prc_all, box=boxo, dens=densities, ma=maout)
+@
+
+This sample looks very nice honestly. I suspect this is a case that got included
+from the \Rcode{prc\_diff} analysis because its control is bad (in this case we
+still have to remove it as case--control pairs are removed together).
+its control.
+<<diff9>>=
+"141975" %in% predict(prc_diff)
+background["141975", "Case_ctrl"] == "case"
+
+background["141975", "match_labnr"]
+@
+
+This suspicion proved correct, it belongs to 141068 which looked very bad above.
+No need to include it in the removal vector, we'll dig out all matches later.
+
+\subsection{141965}
+<<highlight10>>=
+highlight("141965", pca=prc_all, box=boxo, dens=densities, ma=maout)
+@
+
+Again this looks like a well-behaved sample, let's see if it isn't also a case
+that needs to be removed because of its control as we saw for sample 141975.
+<<diff10>>=
+"141965" %in% predict(prc_diff)
+background["141965", "Case_ctrl"] == "case"
+
+background["141965", "match_labnr"]
+@
+
+As suspected, this is the case match for 140362.
+
+\subsection{Remove bad samples and their partners}
+And so the samples slated for removal:
+<<removal>>=
+for_removal <- union(for_removal, background[for_removal, "match_labnr"])
+length(for_removal)
+for_removal
+
+# recall that lumi objects are probes x samples
+# also recall that subsetting by logical vector ruins the Lumi object...
+dim(data)
+data <- data[, which(!colnames(data) %in% for_removal)]
+dim(data)
+@
+
+\section{Second round of outlier detection/removal}
+Let's now just do a real fast run through the whole process again to convince
+ourselves that we got all of it.
+<<fit models &c>>=
+l2expr <- log2(t(exprs(data)))
+prc <- prcout(l2expr)
+box <- boxout(l2expr)
+map <- mapout(l2expr)
+
+plot(prc, sdev=6)
+plot(box, sdev=4)
+plot(map, nout=3, lineup=T)
+@
+
+Three standard deviations flags far too many outliers in the PCA plot now, we'll
+we'll go with six instead. Nothing looks too crazy in the boxplots so I don't
+think I won't use any outliers from that one. Let's look at the mutual information from the MA plot before
+deciding in that case.
+<<maphist2>>=
+hist(map$information, nclass=30)
+@
+
+This doesn't make me much more certain, it really doesn't look too bad. We'll
+take a look at the ones above three standard deviations.
+<<outliers2>>=
+outliers_prc <- predict(prc, sdev=6); outliers_prc
+outliers_map <- predict(map, sdev=3); outliers_map
+@
+
+<<lumi>>=
+plot(data, what="outlier")
+outliers_tree <- c("139993", "142035")
+@
+
+Again it's kind of hard to read the tree plot, but the two outliers are 139993 and 142035.
+
+<<outliers>>=
+outliers <- sort(unique(c(outliers_tree, outliers_map, outliers_prc)))
+
+#  "108114" "134885" "139993" "142035" "146409" "146536" "147357"
+densities <- dens(l2expr)
+plot(densities, highlight=outliers)
+@
+
+The densities for these arrays don't look outrageous, bet let's go on to working
+through our laundry list of outliers.
+
+\subsection{108114}
+<<outlier21>>=
+for_removal = NULL # to avoid confusion
+highlight("108114", pca=prc, box=box, dens=densities, ma=map)
+@
+
+This is one of the high-mutual-information samples. It looks quite nice in most
+respects however, so I'll leave it in.
+
+\subsection{134885}
+<<outlier22>>=
+highlight("134885", pca=prc, box=box, dens=densities, ma=map)
+@
+
+Another high-MI samples, it's also kind of dodgy in the other plots. The lab
+info also suggests we should remove it:
+<<lab22>>=
+labInfo["134885", lab_variables]
+lab_thresholds
+for_removal <- c(for_removal, "134885")
+@
+
+\subsection{139993} % tree
+<<outlier23>>=
+highlight("139993", pca=prc, box=box, dens=densities, ma=map)
+@
+This is one of the two weird samples from the tree plot, it looks left-skewed
+in terms of densities, it's far out in the PCA plot, and the MA plot looks
+slightly banana-shaped. The lab measures aren't the worst, but I think I'll take
+this one out as well.
+<<lab23>>=
+labInfo["139993", lab_variables]
+lab_thresholds
+for_removal <- c(for_removal, "139993")
+@
+
+\subsection{142035} % tree
+<<outlier24>>=
+highlight("142035", pca=prc, box=box, dens=densities, ma=map)
+@
+This is the other bad sample from the tree plot. You can sort of see why it got
+clustered together with 139993 as it looks similar in many respects.
+<<lab23>>=
+labInfo["142035", lab_variables]
+lab_thresholds
+
+for_removal <- c(for_removal, "142035")
+@
+
+\subsection{146409}
+<<outlier25>>=
+highlight("146409", pca=prc, box=box, dens=densities, ma=map)
+@
+
+This one seems to have been suggested as an outlier from the PCA plot, but I honestly
+don't think it looks too bad. I think the PCA plot looks clean enough that we
+donn't need to worry too much about something that's at the edge of it if
+it looks fine in all other respects.
+
+\subsection{146536}
+<<outlier26>>=
+highlight("146536", pca=prc, box=box, dens=densities, ma=map)
+@
+This one also looks good enought that I'll keep it.
+
+\subsection{147357}
+<<outlier27>>=
+highlight("147357", pca=prc, box=box, dens=densities, ma=map)
+@
+Same as the two previous, I hesitate to remove something simply because it's on
+the edge of the PCA plot.
+
+\subsection{Removal, round2}
+<<remove>>=
+for_removal <- union(for_removal, background[for_removal, "match_labnr"])
+length(for_removal)
+for_removal
+
+# recall that lumi objects are probes x samples
+# also recall that subsetting by logical vector ruins the Lumi object...
+dim(data)
+data <- data[, which(!colnames(data) %in% for_removal)]
+dim(data)
+@
+
+\subsection{Last look at the data}
+Let's just re-fit all the models on our new data so see how it looks now.
+<<last look>>=
+l2expr <- log2(t(exprs(data)))
+prc <- prcout(l2expr)
+box <- boxout(l2expr)
+map <- mapout(l2expr)
+
+plot(prc, highlight="")
+plot(box)
+plot(map, nout=3, lineup=T)
+@
 \end{document}
