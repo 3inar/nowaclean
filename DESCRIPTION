@@ -11,7 +11,15 @@ License: MIT + file LICENSE
 LazyData: TRUE
 VignetteBuilder: knitr
 Imports:
-    plyr, entropy, RColorBrewer
+    plyr,
+    entropy,
+    RColorBrewer,
+    limma,
+    preprocessCore,
+    AnnotationDbi,
+    lumiHumanAll.db,
+    illuminaHumanv4.db,
+    lumi
 Suggests:
     BiocStyle,
     knitr,
