@@ -1,16 +1,42 @@
-
 # do clean 1st
 #' @export
 corrected <- function(data, negative_controls) {
-  expr <- exprs(data)
+  
+  if(is(data, "LumiBatch")){
+    expr <- Biobase::exprs(data)
+  } else if(is(data, "matrix")) { 
+    expr <- data
+  } else {
+    stop("data must be either a LumiBatch object or a matrix")
+  }
+  
+  no_variance = names(which(apply(expr, 2, sd) == 0))
+  if(length(no_variance > 0)){
+    stop("Found samples with no variance (e.g. gene expression values all zero). Please investigate samples: ",
+         paste(unlist(no_variance), collapse=" "), ".")
+  }
+  
+  negative = names(which(apply(expr, 2, min) < 0))
+  if(length(negative > 0)){
+    stop("Found samples with negative gene expression values. Please investigate samples: ",
+         paste(unlist(negative), collapse=""), ".")
+  }
+  
+  
   total <- rbind(expr, negative_controls[, colnames(expr)])
   probe_t <- c(rep("regular", nrow(expr)), rep("negative", nrow(negative_controls)))
   expr <- limma::nec(total, probe_t)
   expr <- expr[probe_t == "regular", ]
-
-  exprs(data) <- expr
+  
+  if(is(data, "LumiBatch")){
+    Biobase::exprs(data) <- expr
+  } else {
+    data <- expr
+  }
+  
   data
 }
+
 
 #' @export
 normalized <- function(data) {
