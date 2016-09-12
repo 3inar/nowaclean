@@ -49,21 +49,26 @@ normalized <- function(data) {
 }
 
 # standards by gunther
-# fval: present in at least (fval)% of samples
+# fval: present in at least (fval*100)% of samples
 # also filters bad probes
 #' @export
 filtered <- function(data, pval=0.01, fval=0.01) {
   threshold <- round(fval*ncol(data))
 
   # counts number of samples with probe detectable at pval level
-  present <- detectionCall(data, Th=pval, type="probe")
+  present <- lumi::detectionCall(data, Th=pval, type="probe")
   remove <- present < threshold
 
+  cat("Removing", sum(remove), "probes that were not present in", 
+      fval*100, "% of the samples.\n")
+  
   probeq <- illuminaHumanv4.db::illuminaHumanv4PROBEQUALITY
   probes <- lumi::nuID2IlluminaID(rownames(data), lib.mapping=NULL,
                                   species ="Human", idType='Probe')
   probe_quality <- unlist(AnnotationDbi::mget(as.character(probes), probeq, ifnotfound=NA))
   bad_quality <- (probe_quality == "Bad") | (probe_quality == "No match")
+  
+  cat("Removing", sum(bad_quality), "bad quality probes.\n")
 
   data <- data[-which(remove | bad_quality), ]
   data
