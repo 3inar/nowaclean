@@ -52,15 +52,12 @@ normalized <- function(data) {
 # fval: present in at least (fval*100)% of samples
 # also filters bad probes
 #' @export
-filtered <- function(data, pval=0.01, fval=0.01) {
+filtered <- function(data, pval=0.01, fval=0.01, verbose=FALSE) {
   threshold <- round(fval*ncol(data))
 
   # counts number of samples with probe detectable at pval level
   present <- lumi::detectionCall(data, Th=pval, type="probe")
   remove <- present < threshold
-
-  cat("Removing", sum(remove), "probes that were not present in", 
-      fval*100, "% of the samples.\n")
   
   probeq <- illuminaHumanv4.db::illuminaHumanv4PROBEQUALITY
   probes <- lumi::nuID2IlluminaID(rownames(data), lib.mapping=NULL,
@@ -68,17 +65,29 @@ filtered <- function(data, pval=0.01, fval=0.01) {
   probe_quality <- unlist(AnnotationDbi::mget(as.character(probes), probeq, ifnotfound=NA))
   bad_quality <- (probe_quality == "Bad") | (probe_quality == "No match")
   
-  cat("Removing", sum(bad_quality), "bad quality probes.\n")
-
+  if(verbose){
+    cat("Removing", sum(remove), "probes that were not present in", 
+        fval*100, "% of the samples.\n")
+    cat("Removing", sum(bad_quality), "bad quality probes.\n")
+  }
+  
   data <- data[-which(remove | bad_quality), ]
   data
 }
 
 #' @export
-probe_aggregated <- function(data) {
+probe_aggregated <- function(data, verbose=FALSE) {
+  probes_in = length(Biobase::featureNames(data))
+  
   annotation(data) <- "lumiHumanAll"
   data <- genefilter::nsFilter(data, var.filter=FALSE)$eset ## aggregate across annotated probes
-
+  
+  probes_out = length(Biobase::featureNames(data))
+  if(verbose){
+    cat("Removed", probes_in-probes_out,
+      "probes after aggregating across annotated probes.\n")
+  }
+  
   data
 }
 
@@ -91,11 +100,11 @@ gene_names <- function(data) {
 }
 
 #' @export
-preprocessed <- function(data, negative_controls, pval=0.01, fval=0.01) {
+preprocessed <- function(data, negative_controls, pval=0.01, fval=0.01, verbose=FALSE) {
   data <- corrected(data, negative_controls)
   data <- normalized(data)
-  data <- filtered(data, pval=pval, fval=fval)
-  data <- probe_aggregated(data)
+  data <- filtered(data, pval=pval, fval=fval, vebose=verbose)
+  data <- probe_aggregated(data, verbose=verbose)
 
   data
 }
