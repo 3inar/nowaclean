@@ -66,7 +66,7 @@ filtered <- function(data, pval=0.01, fval=0.01, verbose=FALSE) {
   bad_quality <- (probe_quality == "Bad") | (probe_quality == "No match")
   
   if(verbose){
-    cat("Removing", sum(remove), "probes that were not present in", 
+    cat("Removing", sum(remove), "probes that were not present in at least", 
         fval*100, "% of the samples.\n")
     cat("Removing", sum(bad_quality), "bad quality probes.\n")
   }
@@ -84,8 +84,8 @@ probe_aggregated <- function(data, verbose=FALSE) {
   
   probes_out = length(Biobase::featureNames(data))
   if(verbose){
-    cat("Removed", probes_in-probes_out,
-      "probes after aggregating across annotated probes.\n")
+    cat("Filtered out", probes_in-probes_out,
+      "probes.\n")
   }
   
   data
