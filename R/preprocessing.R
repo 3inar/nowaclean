@@ -103,7 +103,7 @@ gene_names <- function(data) {
 preprocessed <- function(data, negative_controls, pval=0.01, fval=0.01, verbose=FALSE) {
   data <- corrected(data, negative_controls)
   data <- normalized(data)
-  data <- filtered(data, pval=pval, fval=fval, vebose=verbose)
+  data <- filtered(data, pval=pval, fval=fval, verbose=verbose)
   data <- probe_aggregated(data, verbose=verbose)
 
   data
