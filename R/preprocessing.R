@@ -127,6 +127,21 @@ gene_names <- function(data) {
   mapping
 }
 
+#' Standard NOWAC preprocessing
+#'
+#' Performs the standard NOWAC preprocessing steps on your data. This happens
+#' after outlier removal. Performs the following steps in the following order:
+#' \itemize{
+#'  \item Background correction. Uses negative control probes (probes that are
+#'  designed to detect noise) to do a normal-exponential convolution correction
+#'  \item Normalization. Quantile/shoehorn normalization.
+#'  \item Probe filtering. Filters out porobes with bad annotation quality,
+#'  probes below detection threshold, and probes that arent' present in a certain
+#'  fraction of the population.
+#'  \item Probe aggregation. Combine probes that detect the same gene to a single
+#'  value.
+#' }
+#'
 #' @export
 preprocessed <- function(data, negative_controls, pval=0.01, fval=0.01, verbose=FALSE) {
   data <- corrected(data, negative_controls)
