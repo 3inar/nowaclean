@@ -18,4 +18,3 @@ a logical vector indicating outlier Y/N as defined by the \code{sdev}
 \description{
 Provides a prediction for whether an observation is a suspected outlier
 }
-

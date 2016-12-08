@@ -18,4 +18,3 @@ to the (smoothed) ecdf of all arrays' intensities pooled. The comparison
 is done by the Kolmogorov--Smirnov statistic where we ignore the presence of
 ties.
 }
-

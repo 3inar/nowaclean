@@ -24,4 +24,3 @@ first outlier (see \code{predict.boxout} documenation).
 \seealso{
 \code{\link{boxout}}, \code{\link{predict.boxout}}
 }
-

@@ -22,4 +22,3 @@ Takes a matrix of samples x measurements and looks for outliers in the two
 first principal components of the data as defined by mahalanobis distance
 to the center of the data in number of standard deviations
 }
-

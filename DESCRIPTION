@@ -3,12 +3,14 @@ Type: Package
 Title: Methods for Standardized Data Cleaning in the Norwegian Women and Cancer
     Group
 Version: 0.2.5
+Encoding: UTF-8
 Date: 2015-10-12
 Author: Einar Holsbø <einar@cs.uit.no>
 Maintainer: Einar Holsbø <einar@cs.uit.no>
 Description: This package implements the methods used for data cleaning
    in the NOWAC transcriptomic material
 License: MIT + file LICENSE
+BugReports: https://github.com/3inar/nowaclean/issues
 LazyData: TRUE
 VignetteBuilder: knitr
 Imports:
@@ -24,4 +26,4 @@ Suggests:
     AnnotationDbi,
     lumiHumanAll.db,
     illuminaHumanv4.db
-RoxygenNote: 5.0.1
+RoxygenNote: 5.0.1.9000

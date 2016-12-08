@@ -17,4 +17,3 @@ a character vector of row names for the outliers as defined by the \code{sdev}
 \description{
 Provides a prediction for whether an observation is a suspected outlier
 }
-

@@ -27,4 +27,3 @@ Alternately colors points by batch if the \code{batch} parameter is defined
 \seealso{
 \code{\link{prcout}}, \code{\link{predict.prcout}}
 }
-
