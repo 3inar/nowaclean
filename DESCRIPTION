@@ -12,17 +12,15 @@ LazyData: TRUE
 VignetteBuilder: knitr
 Imports:
     plyr,
-    entropy,
-    RColorBrewer,
-    limma,
-    preprocessCore,
-    AnnotationDbi,
-    lumiHumanAll.db,
-    illuminaHumanv4.db,
-    lumi
+    entropy
 Suggests:
     BiocStyle,
     knitr,
     lumi,
-    testthat
+    testthat,
+    limma,
+    preprocessCore,
+    AnnotationDbi,
+    lumiHumanAll.db,
+    illuminaHumanv4.db
 RoxygenNote: 5.0.1
