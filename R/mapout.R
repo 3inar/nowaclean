@@ -104,12 +104,12 @@ fullreport <- function(obj, perpage=20, subsample=T) {
   # replicate(plot(rnorm(99)), n = 6)          ## 6 example plots
   # dev.off()
 
-  pdf(file="report.pdf", width=8.3, height=11.7, onefile=T)
+  grDevices::pdf(file="report.pdf", width=8.3, height=11.7, onefile=T)
   par(omi = rep(.5, 4))                      ## 1/2 inch outer margins
   plyr::l_ply(pages, function(candidates) {
     plot(obj, highlight=candidates, ncol=4, subsample=subsample)
   })
-  dev.off()
+  grDevices::dev.off()
 }
 
 outlierplot <- function(obj, sdev=2, ncol=5, subsample=T) {
