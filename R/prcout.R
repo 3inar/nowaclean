@@ -10,7 +10,7 @@
 #'  Chebyshev's inequality P(|Z| >= k) =< 1/k^2 and applied to the two
 #'  first PCs.
 #'
-#' @return an object of class \code{prcout}. Can be plotted with plot(obj)
+#' @return an object of class \code{prcout}
 #'
 #' @export
 prcout <- function(x, prob=0.01) {
@@ -92,6 +92,7 @@ plot.prcout <- function(obj, batch=NULL, highlight=NULL, ...) {
 #'
 #' Provides a prediction for whether an observation is a suspected outlier
 #'
+#' @param obj object of class "prcout"
 #' @param sdev Number of standard deviations (in mahalanobis distance) that an
 #'  observation should be from the center to be called an outlier
 #'

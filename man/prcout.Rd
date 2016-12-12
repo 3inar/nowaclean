@@ -15,7 +15,7 @@ Chebyshev's inequality P(|Z| >= k) =< 1/k^2 and applied to the two
 first PCs.}
 }
 \value{
-an object of class \code{prcout}. Can be plotted with plot(obj)
+an object of class \code{prcout}
 }
 \description{
 Takes a matrix of samples x measurements and looks for outliers in the two

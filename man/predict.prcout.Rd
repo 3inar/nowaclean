@@ -7,6 +7,8 @@
 \method{predict}{prcout}(obj, sdev = 3)
 }
 \arguments{
+\item{obj}{object of class "prcout"}
+
 \item{sdev}{Number of standard deviations (in mahalanobis distance) that an
 observation should be from the center to be called an outlier}
 }
