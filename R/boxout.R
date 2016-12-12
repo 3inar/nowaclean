@@ -15,10 +15,10 @@ boxout <- function(x) {
   obj <- list()
   class(obj) <- "boxout"
 
-  pooledcdf <- ecdf(x)
+  pooledcdf <- stats::ecdf(x)
   statistics <- plyr::aaply(x, 1, function(row) {
     # for plots
-    quants <- quantile(row, c(0.25, 0.5, 0.75))
+    quants <- stats::quantile(row, c(0.25, 0.5, 0.75))
     iqr <- abs(quants[3] - quants[1])
     inner <- abs(row - quants[2]) <= 1.5*iqr
     whisker_l <- min(row[inner])
@@ -28,7 +28,7 @@ boxout <- function(x) {
     # i don't care that I can't get exact p-values due to ties, I just
     # want the statistic.
     suppressWarnings(
-      kolmogs <- ks.test(row, pooledcdf)$statistic
+      kolmogs <- stats::ks.test(row, pooledcdf)$statistic
     )
     res <- c(whisker_l, quants, whisker_u, kolmogs)
     names(res) <- NULL
@@ -75,7 +75,7 @@ plot.boxout<- function(x, batch=NULL, highlight=NULL, ...) {
   if (!is.null(highlight)) {
     hli <- which(rownames(quant) %in% highlight)
   } else if(is.null(batch)) {
-    hli <- (length(kstats) - length(predict(x, ...)))
+    hli <- (length(kstats) - length(predict.boxout(x, ...)))
   } else {
     hli <- c()
   }
@@ -110,5 +110,5 @@ plot.boxout<- function(x, batch=NULL, highlight=NULL, ...) {
 #' @export
 predict.boxout <- function(obj, sdev=3) {
   kst <- obj$statistics[, "ks"]
-  rownames(obj$statistics)[kst - mean(kst) > sdev*sd(kst)]
+  rownames(obj$statistics)[kst - mean(kst) > sdev*stats::sd(kst)]
 }

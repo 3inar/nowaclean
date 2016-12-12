@@ -33,7 +33,7 @@ corrected <- function(data, negative_controls) {
     stop("data must be either a LumiBatch object or a matrix")
   }
 
-  no_variance = names(which(apply(expr, 2, sd) == 0))
+  no_variance = names(which(apply(expr, 2, stats::sd) == 0))
   if(length(no_variance > 0)){
     stop("Found samples with no variance (e.g. gene expression values all zero). Please investigate samples: ",
          paste(unlist(no_variance), collapse=" "), ".")

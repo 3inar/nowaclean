@@ -16,21 +16,21 @@
 prcout <- function(x, prob=0.01) {
   if (is.null(rownames(x))) stop("input x should have rownames")
   obj <- list()
-  obj$prc <- prcomp(x)
+  obj$prc <- stats::prcomp(x)
 
   # identify inner 100(1-prob)% mass of data in PCs 1 and 2
   prc <- obj$prc$x[, 1:2]
   alpha <- prob
   k <- sqrt(1/alpha)
-  x95 <- abs((prc[, 1] - mean(prc[, 1]))/sd(prc[, 1])) < k
-  y95 <- abs((prc[, 2] - mean(prc[, 2]))/sd(prc[, 2])) < k
+  x95 <- abs((prc[, 1] - mean(prc[, 1]))/stats::sd(prc[, 1])) < k
+  y95 <- abs((prc[, 2] - mean(prc[, 2]))/stats::sd(prc[, 2])) < k
   prc_inner <- prc[x95 & y95, ]
 
   # define mahalanobis distances af f'n of inner data, apply to all data
   obj$mu <- colMeans(prc_inner)
-  obj$Sigma <- cov(prc_inner)
-  obj$sd <- sd(mahalanobis(prc_inner, obj$mu, obj$Sigma))
-  obj$mahalanobis <- mahalanobis(prc, obj$mu, obj$Sigma)
+  obj$Sigma <- stats::cov(prc_inner)
+  obj$sd <- stats::sd(stats::mahalanobis(prc_inner, obj$mu, obj$Sigma))
+  obj$mahalanobis <- stats::mahalanobis(prc, obj$mu, obj$Sigma)
 
   class(obj) <- "prcout"
   obj
@@ -61,13 +61,13 @@ plot.prcout <- function(obj, batch=NULL, highlight=NULL, ...) {
   s1 <- seq(r1[1], r1[2], length.out=50)
   s2 <- seq(r2[1], r2[2], length.out=50)
   grid <- expand.grid(s1,s2)
-  mha <- matrix(mahalanobis(grid, obj$mu, obj$Sigma), nrow=length(s1))
+  mha <- matrix(stats::mahalanobis(grid, obj$mu, obj$Sigma), nrow=length(s1))
 
   # plot
   contour(s1, s2, mha/obj$sd, levels=1:6)
 
   if (is.null(highlight)) {
-    hset <- predict(obj, ...)
+    hset <- predict.prcout(obj, ...)
   }  else {
     hset <- highlight
   }
@@ -102,6 +102,5 @@ plot.prcout <- function(obj, batch=NULL, highlight=NULL, ...) {
 #' @export
 predict.prcout <- function(obj, sdev=3) {
   rownames(obj$prc$x)[obj$mahalanobis > sdev*obj$sd]
-
 }
 

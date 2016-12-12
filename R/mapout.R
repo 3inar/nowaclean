@@ -6,7 +6,7 @@ mapout <- function(x) {
   obj <- list()
   class(obj) <- "mapout"
 
-  obj$median_array <- plyr::aaply(x, 2, median)
+  obj$median_array <- plyr::aaply(x, 2, stats::median)
 
   # m statistics
   obj$M <- plyr::aaply(x, 1, function(array) {
@@ -49,7 +49,7 @@ mapout <- function(x) {
 #' @export
 predict.mapout <- function(obj, sdev=3) {
   info <- obj$information
-  rownames(obj$M)[info > mean(info) + sdev*sd(info)]
+  rownames(obj$M)[info > mean(info) + sdev*stats::sd(info)]
 }
 
 #' @export
@@ -113,7 +113,7 @@ fullreport <- function(obj, perpage=20, subsample=T) {
 }
 
 outlierplot <- function(obj, sdev=2, ncol=5, subsample=T) {
-  outliers <- predict(obj, sdev=sdev)
+  outliers <- predict.mapout(obj, sdev=sdev)
 
   worst <- which(outliers)
   worst <- worst[order(obj$information[outliers], decreasing = T)]
@@ -132,7 +132,7 @@ single_plot <- function(obj, samplename, genes, xrange, yrange, spline=F, rs=F) 
   abline(h=0, col="red")
 
   if (spline) {
-    lo <- loess(obj$M[w, genes]~obj$A[w, genes])
-    curve(predict(lo, x), col="red", lty=2, add=T)
+    lo <- stats::loess(obj$M[w, genes]~obj$A[w, genes])
+    curve(stats::predict(lo, x), col="red", lty=2, add=T)
   }
 }
