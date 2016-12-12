@@ -5,7 +5,7 @@
 #' is done by the Kolmogorov--Smirnov statistic where we ignore the presence of
 #' ties.
 #'
-#' @param x A matrix of array intensities, samples by row.
+#' @param x A matrix of intensities, observations by row.
 #'
 #' @return An object of class "boxout"
 #' @export
@@ -49,9 +49,9 @@ boxout <- function(x) {
 #' first outlier (see \code{predict.boxout} documenation).
 #'
 #' @param x an object of class \code{boxout}
-#' @param batch optional vector of batch labels for each array. If provided,
-#'  the arrays will be sorted by batch and the batches separated by grey lines.
-#'  @param highlight optional character vector of samples to highlight with a
+#' @param batch optional vector of batch labels for each observation. If provided,
+#'  the observations will be sorted by batch and the batches separated by grey lines.
+#'  @param highlight optional character vector of observations to highlight with a
 #'    red line. Overrides the highlighting of first outlier.
 #' @param ... passed to predict(obj, ...) to label outliers
 #' @seealso \code{\link{boxout}}, \code{\link{predict.boxout}}
@@ -103,7 +103,7 @@ plot.boxout<- function(x, batch=NULL, highlight=NULL, ...) {
 #'  observation should be larger than the mean KS statistic in order to be
 #'  considered an outlier
 #'
-#' @return a logical vector indicating outlier Y/N as defined by the \code{sdev}
+#' @return a vector of names for the outlying observations as defined by the \code{sdev}
 #'  parameter.
 #'
 #' @export

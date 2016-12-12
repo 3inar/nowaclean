@@ -12,7 +12,7 @@ observation should be larger than the mean KS statistic in order to be
 considered an outlier}
 }
 \value{
-a logical vector indicating outlier Y/N as defined by the \code{sdev}
+a vector of names for the outlying observations as defined by the \code{sdev}
  parameter.
 }
 \description{

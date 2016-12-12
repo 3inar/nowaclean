@@ -7,7 +7,7 @@
 boxout(x)
 }
 \arguments{
-\item{x}{A matrix of array intensities, samples by row.}
+\item{x}{A matrix of intensities, observations by row.}
 }
 \value{
 An object of class "boxout"
