@@ -141,6 +141,18 @@ gene_names <- function(data) {
 #'  value.
 #' }
 #'
+#' @param data matrix or LumiBatch, observations by columns, probes by rows
+#' @param negative_controls matrix of negative probe intensities for background
+#'   correction.
+#' @param pval a threshold for non-detection of a signal. a signal with detection
+#'   p-value above \code{pval} will be discarded.
+#' @param fval the smallest proportion of observations in which a signal should be
+#'   detected (as defined by \code{pval}). If \code{fval} is 0.5, there must be a
+#'   detectable signal in half the observations or the probe will be discarded.
+#' @param verbose print extra info about filtering/aggregation of probes? Defaults to no.
+#'
+#' @return a processed object of same type as \code{data}
+#'
 #' @export
 preprocessed <- function(data, negative_controls, pval=0.01, fval=0.01, verbose=FALSE) {
   data <- corrected(data, negative_controls)

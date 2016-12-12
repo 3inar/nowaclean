@@ -7,6 +7,24 @@
 preprocessed(data, negative_controls, pval = 0.01, fval = 0.01,
   verbose = FALSE)
 }
+\arguments{
+\item{data}{matrix or LumiBatch, observations by columns, probes by rows}
+
+\item{negative_controls}{matrix of negative probe intensities for background
+correction.}
+
+\item{pval}{a threshold for non-detection of a signal. a signal with detection
+p-value above \code{pval} will be discarded.}
+
+\item{fval}{the smallest proportion of observations in which a signal should be
+detected (as defined by \code{pval}). If \code{fval} is 0.5, there must be a
+detectable signal in half the observations or the probe will be discarded.}
+
+\item{verbose}{print extra info about filtering/aggregation of probes? Defaults to no.}
+}
+\value{
+a processed object of same type as \code{data}
+}
 \description{
 Performs the standard NOWAC preprocessing steps on your data. This happens
 after outlier removal. Performs the following steps in the following order:
