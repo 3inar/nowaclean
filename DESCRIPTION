@@ -8,22 +8,24 @@ Date: 2015-10-12
 Author: Einar Holsbø <einar@cs.uit.no>
 Maintainer: Einar Holsbø <einar@cs.uit.no>
 Description: This package implements the methods used for data cleaning
-   in the NOWAC transcriptomic material
+   in the NOWAC transcriptomic material.
 License: MIT + file LICENSE
 BugReports: https://github.com/3inar/nowaclean/issues
 LazyData: TRUE
 VignetteBuilder: knitr
 Imports:
     plyr,
+    RColorBrewer,
     entropy
 Suggests:
-    BiocStyle,
+    testthat,
+    Biobase,
     knitr,
     lumi,
-    testthat,
     limma,
     preprocessCore,
     AnnotationDbi,
     lumiHumanAll.db,
+    genefilter,
     illuminaHumanv4.db
 RoxygenNote: 5.0.1.9000

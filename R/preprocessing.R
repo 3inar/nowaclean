@@ -1,3 +1,14 @@
+suggested_packages <- c(
+  "lumi",
+  "Biobase",
+  "limma",
+  "genefilter",
+  "preprocessCore",
+  "AnnotationDbi",
+  "lumiHumanAll.db",
+  "illuminaHumanv4.db"
+)
+
 req_pkg <- function(pkg_name) {
   if (!requireNamespace(pkg_name, quietly = TRUE)) {
     stop(pkg_name, " (biconductor) needed for this function to work. Please install it.",
@@ -6,20 +17,8 @@ req_pkg <- function(pkg_name) {
 }
 
 req_pkgs <- function() {
-  package_list <- c(
-    "lumi",
-    "limma",
-    "preprocessCore",
-    "AnnotationDbi",
-    "lumiHumanAll.db",
-    "illuminaHumanv4.db"
-  )
-
-  plyr::a_ply(package_list, 1, req_pkg)
+  plyr::a_ply(suggested_packages, 1, req_pkg)
 }
-
-
-
 
 # do clean 1st
 #' @export
