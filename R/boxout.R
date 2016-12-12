@@ -51,7 +51,7 @@ boxout <- function(x) {
 #' @param x an object of class \code{boxout}
 #' @param batch optional vector of batch labels for each observation. If provided,
 #'  the observations will be sorted by batch and the batches separated by grey lines.
-#'  @param highlight optional character vector of observations to highlight with a
+#' @param highlight optional character vector of observations to highlight with a
 #'    red line. Overrides the highlighting of first outlier.
 #' @param ... passed to predict(obj, ...) to label outliers
 #' @seealso \code{\link{boxout}}, \code{\link{predict.boxout}}
@@ -99,6 +99,7 @@ plot.boxout<- function(x, batch=NULL, highlight=NULL, ...) {
 #'
 #' Provides a prediction for whether an observation is a suspected outlier
 #'
+#' @param obj an object of class "boxout"
 #' @param sdev Number of standard deviations (in KS statistic) that an
 #'  observation should be larger than the mean KS statistic in order to be
 #'  considered an outlier

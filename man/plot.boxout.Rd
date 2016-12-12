@@ -10,9 +10,10 @@
 \item{x}{an object of class \code{boxout}}
 
 \item{batch}{optional vector of batch labels for each observation. If provided,
-the observations will be sorted by batch and the batches separated by grey lines.
-@param highlight optional character vector of observations to highlight with a
-  red line. Overrides the highlighting of first outlier.}
+the observations will be sorted by batch and the batches separated by grey lines.}
+
+\item{highlight}{optional character vector of observations to highlight with a
+red line. Overrides the highlighting of first outlier.}
 
 \item{...}{passed to predict(obj, ...) to label outliers}
 }

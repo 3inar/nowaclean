@@ -7,6 +7,8 @@
 \method{predict}{boxout}(obj, sdev = 3)
 }
 \arguments{
+\item{obj}{an object of class "boxout"}
+
 \item{sdev}{Number of standard deviations (in KS statistic) that an
 observation should be larger than the mean KS statistic in order to be
 considered an outlier}
