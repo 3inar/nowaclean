@@ -16,6 +16,7 @@ VignetteBuilder: knitr
 Imports:
     plyr,
     RColorBrewer,
+    methods,
     entropy
 Suggests:
     testthat,

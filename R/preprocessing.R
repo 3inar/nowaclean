@@ -25,9 +25,9 @@ req_pkgs <- function() {
 corrected <- function(data, negative_controls) {
   req_pkgs()
 
-  if(is(data, "LumiBatch")){
+  if(methods::is(data, "LumiBatch")){
     expr <- Biobase::exprs(data)
-  } else if(is(data, "matrix")) {
+  } else if(methods::is(data, "matrix")) {
     expr <- data
   } else {
     stop("data must be either a LumiBatch object or a matrix")
@@ -51,7 +51,7 @@ corrected <- function(data, negative_controls) {
   expr <- limma::nec(total, probe_t)
   expr <- expr[probe_t == "regular", ]
 
-  if(is(data, "LumiBatch")){
+  if(methods::is(data, "LumiBatch")){
     Biobase::exprs(data) <- expr
   } else {
     data <- expr
