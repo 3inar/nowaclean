@@ -1,8 +1,8 @@
-testdata <- matrix(c(rnorm(100, mean=10, sd=1),
+testdata <- abs(matrix(c(rnorm(100, mean=10, sd=1),
                      rnorm(100, mean=10, sd=2),
                      rnorm(100, mean=10, sd=3),
                      rnorm(100, mean=10, sd=4)),
-                     nrow = 100)
+                     nrow = 100))
 
 negs <- cbind(testdata, matrix(c(rnorm(100, mean=10, sd=1),
                  rnorm(100, mean=10, sd=2)),
@@ -19,7 +19,7 @@ colnames(testdata_with_negative) <- c("V1","V2","V3","V4","negative")
 
 test_that("corrected() works when all values are positive", {
   plyr::a_ply(suggested_packages, 1, skip_if_not_installed)
-  expect_output(corrected(testdata, negs))
+  corrected(testdata, negs)
 })
 
 test_that("corrected() throws an error when one column is all zeros", {
