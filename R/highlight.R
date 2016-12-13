@@ -12,7 +12,7 @@
 #'
 #' @export
 highlight <- function(observation, pca, box, dens, ma) {
-   old.par <- par(mfrow=c(2,2))
+   old.par <- graphics::par(mfrow=c(2,2))
 
    if (!is.character(observation)) stop("observation should be character vector")
    if (class(pca) != "prcout") stop("pca class should be prcout")
@@ -20,10 +20,10 @@ highlight <- function(observation, pca, box, dens, ma) {
    if (class(dens) != "dens") stop("dens class should be dens")
    if (class(ma) != "mapout") stop("ma class should be mapout")
 
-   plot(pca, highlight=observation)
-   plot(box, highlight=observation)
-   plot(dens, highlight=observation)
-   plot(ma, highlight=observation)
+   graphics::plot(pca, highlight=observation)
+   graphics::plot(box, highlight=observation)
+   graphics::plot(dens, highlight=observation)
+   graphics::plot(ma, highlight=observation)
 
-   par(old.par)
+   graphics::par(old.par)
 }

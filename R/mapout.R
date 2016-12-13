@@ -60,7 +60,7 @@ plot.mapout <- function(obj, nout=1, highlight=NULL, lineup=F, subsample=T,
   else nplots <- nplots <- ifelse(lineup, 2*length(highlight), length(highlight))
   nrows <- ceiling(nplots/ncol)
 
-  if (nplots > 1) old.par <- par(mfrow=c(nrows,ncol))
+  if (nplots > 1) old.par <- graphics::par(mfrow=c(nrows,ncol))
 
   if (subsample) {
     nsub <- ceiling(ncol(obj$M))/10
@@ -92,7 +92,7 @@ plot.mapout <- function(obj, nout=1, highlight=NULL, lineup=F, subsample=T,
     }
   }
 
-  if (nplots > 1) par(old.par)
+  if (nplots > 1) graphics::par(old.par)
 }
 
 fullreport <- function(obj, perpage=20, subsample=T) {
@@ -105,9 +105,9 @@ fullreport <- function(obj, perpage=20, subsample=T) {
   # dev.off()
 
   grDevices::pdf(file="report.pdf", width=8.3, height=11.7, onefile=T)
-  par(omi = rep(.5, 4))                      ## 1/2 inch outer margins
+  graphics::par(omi = rep(.5, 4))                      ## 1/2 inch outer margins
   plyr::l_ply(pages, function(candidates) {
-    plot(obj, highlight=candidates, ncol=4, subsample=subsample)
+    graphics::plot(obj, highlight=candidates, ncol=4, subsample=subsample)
   })
   grDevices::dev.off()
 }
@@ -118,7 +118,7 @@ outlierplot <- function(obj, sdev=2, ncol=5, subsample=T) {
   worst <- which(outliers)
   worst <- worst[order(obj$information[outliers], decreasing = T)]
 
-  plot(obj, highlight=worst, ncol=ncol, subsample=subsample)
+  graphics::plot(obj, highlight=worst, ncol=ncol, subsample=subsample)
 }
 
 single_plot <- function(obj, samplename, genes, xrange, yrange, spline=F, rs=F) {
@@ -126,13 +126,13 @@ single_plot <- function(obj, samplename, genes, xrange, yrange, spline=F, rs=F) 
 
   title <- rownames(obj$M)[w]
   if (rs) title <- paste0(title, " (random)")
-  plot(obj$A[w, genes], obj$M[w, genes], main=title,
+  graphics::plot(obj$A[w, genes], obj$M[w, genes], main=title,
        sub=paste0("MI: ", obj$information[w]),
        ylim=yrange, xlim=xrange)
-  abline(h=0, col="red")
+  graphics::abline(h=0, col="red")
 
   if (spline) {
     lo <- stats::loess(obj$M[w, genes]~obj$A[w, genes])
-    curve(stats::predict(lo, x), col="red", lty=2, add=T)
+    graphics::curve(stats::predict(lo, x), col="red", lty=2, add=T)
   }
 }

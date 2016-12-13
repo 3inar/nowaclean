@@ -70,7 +70,7 @@ plot.boxout<- function(x, batch=NULL, highlight=NULL, ...) {
   ymax <- max(quant)
   ymin <- min(quant)
 
-  plot(quant[, "0.5"], type="n", ylim=c(ymin, ymax)) #, ...)
+  graphics::plot(quant[, "0.5"], type="n", ylim=c(ymin, ymax)) #, ...)
 
   if (!is.null(highlight)) {
     hli <- which(rownames(quant) %in% highlight)
@@ -82,16 +82,16 @@ plot.boxout<- function(x, batch=NULL, highlight=NULL, ...) {
 
   if (!is.null(batch)) {
     cuts <- which(!duplicated(batch[batchorder]))
-    abline(v=cuts[-1], col="gray") # 1st one uninformative
+    graphics::abline(v=cuts[-1], col="gray") # 1st one uninformative
   }
 
-  abline(v=hli, col="red")
+  graphics::abline(v=hli, col="red")
 
-  lines(quant[, "wl"], lty="dashed")
-  lines(quant[, "wu"], lty="dashed")
-  lines(quant[, "0.25"])
-  lines(quant[, "0.75"])
-  lines(quant[, "0.5"], lwd=2)
+  graphics::lines(quant[, "wl"], lty="dashed")
+  graphics::lines(quant[, "wu"], lty="dashed")
+  graphics::lines(quant[, "0.25"])
+  graphics::lines(quant[, "0.75"])
+  graphics::lines(quant[, "0.5"], lwd=2)
 
 }
 

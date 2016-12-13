@@ -64,7 +64,7 @@ plot.prcout <- function(obj, batch=NULL, highlight=NULL, ...) {
   mha <- matrix(stats::mahalanobis(grid, obj$mu, obj$Sigma), nrow=length(s1))
 
   # plot
-  contour(s1, s2, mha/obj$sd, levels=1:6)
+  graphics::contour(s1, s2, mha/obj$sd, levels=1:6)
 
   if (is.null(highlight)) {
     hset <- predict.prcout(obj, ...)
@@ -79,11 +79,11 @@ plot.prcout <- function(obj, batch=NULL, highlight=NULL, ...) {
       batch <- ((batch - 1) %% 12) + 1
     }
     colors <- colv[batch]
-    points(prc, col=colors, pch=20)
+    graphics::points(prc, col=colors, pch=20)
   }  else {
     colors <- rep("black", nrow(prc))
     colors[rownames(prc) %in% hset] <- "red"
-    points(prc[order(colors), ], col=colors[order(colors)], pch=20)
+    graphics::points(prc[order(colors), ], col=colors[order(colors)], pch=20)
   }
 
 }
