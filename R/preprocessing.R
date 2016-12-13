@@ -1,6 +1,7 @@
 suggested_packages <- c(
   "lumi",
   "Biobase",
+  "BiocGenerics",
   "limma",
   "genefilter",
   "preprocessCore",
@@ -64,10 +65,10 @@ corrected <- function(data, negative_controls) {
 #' @export
 normalized <- function(data) {
   req_pkgs()
-  tmp <- preprocessCore::normalize.quantiles(exprs(data), copy=TRUE)
+  tmp <- preprocessCore::normalize.quantiles(Biobase::exprs(data), copy=TRUE)
   rownames(tmp) <- rownames(data)
   colnames(tmp) <- colnames(data)
-  exprs(data) <- tmp
+  Biobase::exprs(data) <- tmp
 
   data
 }
@@ -105,7 +106,7 @@ probe_aggregated <- function(data, verbose=FALSE) {
   req_pkgs()
   probes_in = length(Biobase::featureNames(data))
 
-  annotation(data) <- "lumiHumanAll"
+  BiocGenerics::annotation(data) <- "lumiHumanAll"
   data <- genefilter::nsFilter(data, var.filter=FALSE)$eset ## aggregate across annotated probes
 
   probes_out = length(Biobase::featureNames(data))
