@@ -4,5 +4,15 @@ sudo: false
 
 r_packages:
   - covr
+bioc_packages:
+  - Biobase
+  - BiocGenerics
+  - lumi
+  - limma
+  - preprocessCpre
+  - AnnotationDbi
+  - lumiHumanAll.db
+  - genefilter
+  - illuminaHumanv4.db
 after_success:
   - Rscript -e 'library(covr); codecov()'
