@@ -129,10 +129,13 @@ single_plot <- function(obj, samplename, genes, xrange, yrange, spline=F, rs=F) 
   graphics::plot(obj$A[w, genes], obj$M[w, genes], main=title,
        sub=paste0("MI: ", obj$information[w]),
        ylim=yrange, xlim=xrange)
-  graphics::abline(h=0, col="red")
+  graphics::abline(h=0, col="grey")
 
   if (spline) {
     lo <- stats::loess(obj$M[w, genes]~obj$A[w, genes])
-    graphics::curve(stats::predict(lo, x), col="red", lty=2, add=T)
+    rge <- range(obj$A)
+    plotseq <- seq(rge[1], rge[2], length.out=100)
+    predictions <- stats::predict(lo, plotseq)
+    graphics::lines(plotseq, predictions, col="red")
   }
 }
