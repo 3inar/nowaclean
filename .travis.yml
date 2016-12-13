@@ -9,7 +9,7 @@ bioc_packages:
   - BiocGenerics
   - lumi
   - limma
-  - preprocessCpre
+  - preprocessCore
   - AnnotationDbi
   - lumiHumanAll.db
   - genefilter
