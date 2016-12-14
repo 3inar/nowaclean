@@ -21,7 +21,14 @@ req_pkgs <- function() {
   plyr::a_ply(suggested_packages, 1, req_pkg)
 }
 
-# do clean 1st
+#' Background correction of expression values
+#'
+#' Normal-exponential background correction based on negative probes
+#'
+#' @param data matrix or LumiBatch, observations by columns, probes by rows
+#' @param negative_controls matrix of negative probe intensities for background
+#'   correction.
+#'
 #' @export
 corrected <- function(data, negative_controls) {
   req_pkgs()
@@ -62,6 +69,12 @@ corrected <- function(data, negative_controls) {
 }
 
 
+#' Normalize gene expression values
+#'
+#' Does quantile normalization of gene epression values
+#'
+#' @param data matrix or LumiBatch, observations by columns, probes by rows
+#'
 #' @export
 normalized <- function(data) {
   req_pkgs()
@@ -73,9 +86,22 @@ normalized <- function(data) {
   data
 }
 
-# standards by gunther
-# fval: present in at least (fval*100)% of samples
-# also filters bad probes
+#' Filtering of bad quality/non-detectable probes
+#'
+#' Filters out probes that have a signal below a specified detection threshold
+#' and that arent expressed in at least some specified fraction of observations.
+#' Also removes probes of "poor" or "no match" quality. See reference
+#'
+#' @param data a LumiBatch
+#' @param pval a threshold for non-detection of a signal. a signal with detection
+#'   p-value above \code{pval} will be discarded.
+#' @param fval the smallest proportion of observations in which a signal should be
+#'   detected (as defined by \code{pval}). If \code{fval} is 0.5, there must be a
+#'   detectable signal in half the observations or the probe will be discarded.
+#' @param verbose print info about filtered-out probes? T/F
+#'
+#' @references  Günther C, Holden M, Holden L. Preprocessing of gene-expression data related to breast cancer diagnosis: SAMBA/35/14. \url{https://www.nr.no/files/samba/smbi/note2015SAMBA3514preprocessing.pdf}
+#'
 #' @export
 filtered <- function(data, pval=0.01, fval=0.01, verbose=FALSE) {
   req_pkgs()
@@ -101,6 +127,14 @@ filtered <- function(data, pval=0.01, fval=0.01, verbose=FALSE) {
   data
 }
 
+#' Aggregates by annotation-based filtering
+#'
+#' Aggregates gene expression values across probes by the "lumiHumanAll" annotation
+#' package
+#'
+#' @param data a LumiBatch
+#' @param verbose print info about filtered-out probes? T/F
+#'
 #' @export
 probe_aggregated <- function(data, verbose=FALSE) {
   req_pkgs()
@@ -118,6 +152,13 @@ probe_aggregated <- function(data, verbose=FALSE) {
   data
 }
 
+#' Get gene name mapping
+#'
+#' Maps gene symbols to probe nuIDs for your data
+#'
+#' @param data gene expression matrix or LumiBatch with nuIDs as
+#'   its \code{rowname()}s.
+#'
 #' @export
 gene_names <- function(data) {
   req_pkgs()
