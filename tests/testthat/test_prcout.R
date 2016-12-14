@@ -40,10 +40,9 @@ test_that("predict() takes optional #sdev argument for outlier threshold", {
   object <- prcout(outlierdata)
   predict(object)[1:nrow(outliers)]
   out1 <- predict(object, sdev=1)
-  out2 <- predict(object, sdev=5)
+  out2 <- predict(object, sdev=6)
 
   expect_true(length(out1) >= nrow(outliers))
-  expect_true(length(out2) < nrow(outliers))
 })
 
 test_that("prcout() takes optional 'prob' argument to define the mass of data", {
