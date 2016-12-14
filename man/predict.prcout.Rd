@@ -4,13 +4,15 @@
 \alias{predict.prcout}
 \title{Predict method for \code{prcout} objects}
 \usage{
-\method{predict}{prcout}(obj, sdev = 3)
+\method{predict}{prcout}(object, sdev = 3, ...)
 }
 \arguments{
-\item{obj}{object of class "prcout"}
+\item{object}{object of class "prcout"}
 
 \item{sdev}{Number of standard deviations (in mahalanobis distance) that an
 observation should be from the center to be called an outlier}
+
+\item{...}{unused}
 }
 \value{
 a character vector of row names for the outliers as defined by the \code{sdev}

@@ -43,7 +43,7 @@ prcout <- function(x, prob=0.01) {
 #' of the data). Highlights outliers or the samples defined in \code{highlight=}.
 #' Alternately colors points by batch if the \code{batch} parameter is defined
 #'
-#' @param obj object of class \code{prcout}
+#' @param x object of class \code{prcout}
 #' @param batch optional vector that indicates which bach a sample belogs to.
 #'  Points will be colored by batch if this vector is provided. Overrides
 #'  \code{highlight=}
@@ -52,7 +52,8 @@ prcout <- function(x, prob=0.01) {
 #' @param ... passed to predict(obj, ...) to label outliers
 #' @seealso \code{\link{prcout}}, \code{\link{predict.prcout}}
 #' @export
-plot.prcout <- function(obj, batch=NULL, highlight=NULL, ...) {
+plot.prcout <- function(x, batch=NULL, highlight=NULL, ...) {
+  obj <- x
   prc <- obj$prc$x[, 1:2]
 
   # grid for contour lines
@@ -92,15 +93,16 @@ plot.prcout <- function(obj, batch=NULL, highlight=NULL, ...) {
 #'
 #' Provides a prediction for whether an observation is a suspected outlier
 #'
-#' @param obj object of class "prcout"
+#' @param object object of class "prcout"
 #' @param sdev Number of standard deviations (in mahalanobis distance) that an
 #'  observation should be from the center to be called an outlier
+#' @param ... unused
 #'
 #' @return a character vector of row names for the outliers as defined by the \code{sdev}
 #'  parameter.
 #'
 #' @export
-predict.prcout <- function(obj, sdev=3) {
-  rownames(obj$prc$x)[obj$mahalanobis > sdev*obj$sd]
+predict.prcout <- function(object, sdev=3, ...) {
+  rownames(object$prc$x)[object$mahalanobis > sdev*object$sd]
 }
 

@@ -47,15 +47,17 @@ mapout <- function(x) {
 }
 
 #' @export
-predict.mapout <- function(obj, sdev=3) {
-  info <- obj$information
-  rownames(obj$M)[info > mean(info) + sdev*stats::sd(info)]
+predict.mapout <- function(object, sdev=3, ...) {
+  info <- object$information
+  rownames(object$M)[info > mean(info) + sdev*stats::sd(info)]
 }
 
 #' @export
-plot.mapout <- function(obj, nout=1, highlight=NULL, lineup=F, subsample=T,
-                        ncol=ifelse(is.null(highlight), nout, length(highlight))) {
+plot.mapout <- function(x, nout=1, highlight=NULL, lineup=F, subsample=T,
+                        ncol=ifelse(is.null(highlight), nout, length(highlight)),
+                        ...) {
 
+  obj <- x
   if (is.null(highlight)) nplots <- ifelse(lineup, 2*nout, nout)
   else nplots <- nplots <- ifelse(lineup, 2*length(highlight), length(highlight))
   nrows <- ceiling(nplots/ncol)

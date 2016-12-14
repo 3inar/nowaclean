@@ -18,12 +18,14 @@ dens <- function(x) {
 #'
 #' Plots all the densities in the \code{dens}-object in a single plot.
 #'
-#' @param obj an object of class "dens"
+#' @param x an object of class "dens"
 #' @param batch a vector indicating which batch a sample belongs to. used for coloring by batch.
 #' @param highlight sample names of samples to highligth in red on the plot. useful for inspecting specific outliers
+#' @param ... unused
 #'
 #' @export
-plot.dens <- function(obj, batch=NULL, highlight=NULL) {
+plot.dens <- function(x, batch=NULL, highlight=NULL, ...) {
+  obj <- x
   xrange <- range(plyr::laply(obj, function(o) {o$x}))
   yrange <- range(plyr::laply(obj, function(o) {o$y}))
 

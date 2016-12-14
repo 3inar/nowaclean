@@ -4,10 +4,10 @@
 \alias{plot.prcout}
 \title{Plot method for \code{prcout} objects}
 \usage{
-\method{plot}{prcout}(obj, batch = NULL, highlight = NULL, ...)
+\method{plot}{prcout}(x, batch = NULL, highlight = NULL, ...)
 }
 \arguments{
-\item{obj}{object of class \code{prcout}}
+\item{x}{object of class \code{prcout}}
 
 \item{batch}{optional vector that indicates which bach a sample belogs to.
 Points will be colored by batch if this vector is provided. Overrides

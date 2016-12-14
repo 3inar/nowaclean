@@ -99,16 +99,17 @@ plot.boxout<- function(x, batch=NULL, highlight=NULL, ...) {
 #'
 #' Provides a prediction for whether an observation is a suspected outlier
 #'
-#' @param obj an object of class "boxout"
+#' @param object an object of class "boxout"
 #' @param sdev Number of standard deviations (in KS statistic) that an
 #'  observation should be larger than the mean KS statistic in order to be
 #'  considered an outlier
+#' @param ... unused
 #'
 #' @return a vector of names for the outlying observations as defined by the \code{sdev}
 #'  parameter.
 #'
 #' @export
-predict.boxout <- function(obj, sdev=3) {
-  kst <- obj$statistics[, "ks"]
-  rownames(obj$statistics)[kst - mean(kst) > sdev*stats::sd(kst)]
+predict.boxout <- function(object, sdev=3, ...) {
+  kst <- object$statistics[, "ks"]
+  rownames(object$statistics)[kst - mean(kst) > sdev*stats::sd(kst)]
 }

@@ -4,14 +4,16 @@
 \alias{plot.dens}
 \title{Plot method for \code{dens} objects}
 \usage{
-\method{plot}{dens}(obj, batch = NULL, highlight = NULL)
+\method{plot}{dens}(x, batch = NULL, highlight = NULL, ...)
 }
 \arguments{
-\item{obj}{an object of class "dens"}
+\item{x}{an object of class "dens"}
 
 \item{batch}{a vector indicating which batch a sample belongs to. used for coloring by batch.}
 
 \item{highlight}{sample names of samples to highligth in red on the plot. useful for inspecting specific outliers}
+
+\item{...}{unused}
 }
 \description{
 Plots all the densities in the \code{dens}-object in a single plot.

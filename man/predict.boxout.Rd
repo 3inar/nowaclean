@@ -4,14 +4,16 @@
 \alias{predict.boxout}
 \title{Predict method for \code{boxout} objects}
 \usage{
-\method{predict}{boxout}(obj, sdev = 3)
+\method{predict}{boxout}(object, sdev = 3, ...)
 }
 \arguments{
-\item{obj}{an object of class "boxout"}
+\item{object}{an object of class "boxout"}
 
 \item{sdev}{Number of standard deviations (in KS statistic) that an
 observation should be larger than the mean KS statistic in order to be
 considered an outlier}
+
+\item{...}{unused}
 }
 \value{
 a vector of names for the outlying observations as defined by the \code{sdev}
