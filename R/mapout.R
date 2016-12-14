@@ -1,4 +1,14 @@
-# NB assumes log transformed
+#' MA-plot-based outlier detection
+#'
+#' Computes M and A statistics between each array and a probe-wise median array. If an
+#' array is well-behaved, there should be no trend in M as a function of A. This
+#' trendiness is estimated by mutual information.
+#'
+#' @param x a matrix of \strong{log transformed, raw} gene expression values
+#'   (not fold change). Observations by row, probes by columns.
+#'
+#' @return an object of class \code{mapout}
+#'
 #' @export
 mapout <- function(x) {
   if (is.null(rownames(x))) stop("input x should have rownames")
@@ -46,12 +56,41 @@ mapout <- function(x) {
   obj
 }
 
+#' Predict method for \code{mapout} objects
+#'
+#' Provides a prediction for whether an observation is a suspected outlier
+#'
+#' @param object object of class "mapout"
+#' @param sdev Number of standard deviations (in mutual information) that an
+#'  observation should be from the center to be called an outlier
+#' @param ... unused
+#'
+#' @return a character vector of row names for the outliers as defined by the \code{sdev}
+#'  parameter.
+#'
 #' @export
 predict.mapout <- function(object, sdev=3, ...) {
   info <- object$information
   rownames(object$M)[info > mean(info) + sdev*stats::sd(info)]
 }
 
+#' Plot method for \code{mapout} objects
+#'
+#' Plots the MA-plots \code{nout} "worst outliers" in a grid of \code{ncol}
+#' columns and plots a loess-smoothed line over the data. You want this line
+#' to be as horizontal as possible, but a certain banana-shape is not uncommon.
+#' The loess-smoothing might be slow, and you might end up with a lot of points
+#' in your plot. To work around this, use \code{subsample=T} (default) to work
+#' examine a random subset of 2500 probes.
+#'
+#' @param x object of class \code{mapout}
+#' @param nout now many outliers to show MAplots for
+#' @param highlight optional character vector with names of samles to show in the plot.
+#'  Overrides the standard plotting of outliers
+#' @param lineup show \code{nout} random samples for comparison? defaults to false.
+#' @param subsample show random subset of 2500 probes for speed. Defaults to true
+#' @param ncol number of columns in output plot
+#' @param ... unused
 #' @export
 plot.mapout <- function(x, nout=1, highlight=NULL, lineup=F, subsample=T,
                         ncol=ifelse(is.null(highlight), nout, length(highlight)),

@@ -17,6 +17,8 @@
 lab_thresholds <- c("Bad: RIN value < 7", "Bad: 260/280 RNA ratio < 2",
                     "Bad: 260/230 RNA ratio < 1.7", "Good: 50 < Ng/ul RNA < 500")
 
+#' Vector of the typical column names for lab variables
+#'
 #' @export
 lab_variables <- c("Ng/ul_RNA", "260/280_RNA", "260/230_RNA", "RIN",
                "Ng/ul_cRNA", "260/280_cRNA", "260/230_cRNA")
