@@ -169,7 +169,7 @@ single_plot <- function(obj, samplename, genes, xrange, yrange, spline=F, rs=F) 
   if (rs) title <- paste0(title, " (random)")
   graphics::plot(obj$A[w, genes], obj$M[w, genes], main=title,
        sub=paste0("MI: ", obj$information[w]),
-       ylim=yrange, xlim=xrange)
+       ylim=yrange, xlim=xrange, xlab="A", ylab="M")
   graphics::abline(h=0, col="grey")
 
   if (spline) {
