@@ -70,7 +70,8 @@ plot.boxout<- function(x, batch=NULL, highlight=NULL, ...) {
   ymax <- max(quant)
   ymin <- min(quant)
 
-  graphics::plot(quant[, "0.5"], type="n", ylim=c(ymin, ymax)) #, ...)
+  graphics::plot(quant[, "0.5"], type="n", ylim=c(ymin, ymax), xlab="Arrays",
+                 ylab="Intensity", xaxt="n") #, ...)
 
   if (!is.null(highlight)) {
     hli <- which(rownames(quant) %in% highlight)
