@@ -29,7 +29,8 @@ plot.dens <- function(x, batch=NULL, highlight=NULL, ...) {
   xrange <- range(plyr::laply(obj, function(o) {o$x}))
   yrange <- range(plyr::laply(obj, function(o) {o$y}))
 
-  graphics::plot(NULL, type="n", xlim=xrange, ylim=yrange, ylab="Density", xlab="")
+  graphics::plot(NULL, type="n", xlim=xrange, ylim=yrange, ylab="Density",
+                 xlab="Intensity")
 
   if (!is.null(highlight)) {
     if (class(highlight) != "character") stop("highlight= should be character")
