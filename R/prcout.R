@@ -65,7 +65,7 @@ plot.prcout <- function(x, batch=NULL, highlight=NULL, ...) {
   mha <- matrix(stats::mahalanobis(grid, obj$mu, obj$Sigma), nrow=length(s1))
 
   # plot
-  graphics::contour(s1, s2, mha/obj$sd, levels=1:6)
+  graphics::contour(s1, s2, mha/obj$sd, levels=1:6, xlab="PC 1", ylab="PC 2")
 
   if (is.null(highlight)) {
     hset <- predict.prcout(obj, ...)
