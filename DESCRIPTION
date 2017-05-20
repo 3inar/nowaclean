@@ -12,7 +12,7 @@ Description: This package implements the methods used for data cleaning
 License: MIT + file LICENSE
 BugReports: https://github.com/3inar/nowaclean/issues
 LazyData: TRUE
-VignetteBuilder: knitr
+VignetteBuilder: R.rsp
 Imports:
     plyr,
     RColorBrewer,
@@ -20,6 +20,7 @@ Imports:
     entropy
 Suggests:
     testthat,
+    R.rsp,
     Biobase,
     BiocGenerics,
     knitr,
