@@ -1,0 +1,249 @@
+%\VignetteEngine{knitr::knitr}
+\documentclass{article}
+\usepackage{graphicx, verbatim}
+\usepackage[utf8]{inputenc}
+
+<<style-knitr, eval=TRUE, echo=FALSE, results="asis">>=
+BiocStyle::latex()
+@
+
+<<cache everything, include=FALSE>>=
+knitr::opts_chunk$set(cache=TRUE, dev="png", dpi=200)
+@
+
+\begin{document}
+
+\bioctitle[nowaclean]{Outlier detection with \Rpackage{nowaclean}}
+\author{Einar Holsbø\footnote{einar@cs.uit.no}}
+\maketitle
+
+\begin{abstract}
+This vignette shows the use of the \Rpackage{nowaclean} \R{} package, which implements the standard
+operating procedure for detecting and removing technical outliers in the NOWAC
+microarray material.
+\end{abstract}
+
+\section{\Rpackage{nowaclean}}\label{section:package}
+\subsection{Installation and loading}
+We'll be using the development version of \Rpackage{nowaclean}, which is
+hosted on GitHub.\footnote{\url{https://github.com}} To install from GitHub you need to install
+\CRANpkg{devtools}.
+<<devtools, eval=FALSE>>=
+install.packages("devtools")
+@
+
+Once you have installed \CRANpkg{devtools}, you can use it to install
+\Rpackage{nowaclean} from its GitHub repository.
+<<nowaclean_install, eval=FALSE>>=
+devtools::install_github("3inar/nowaclean", build_vignettes=T)
+@
+Once it is installed, you can use \Rpackage{nowaclean} like you would any other \R{}
+package.
+<<nowaclean_load>>=
+library(nowaclean)
+@
+
+To view \Rpackage{nowaclean} on github (for instance for bug reports, etc.), visit
+\url{https://github.com/3inar/nowaclean}.
+
+\section{Loading and Preprocessing}\label{section:preprocessing}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PREPROCESSING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+First to load the dataset; we have suppressed the huge text dump that happens
+when you load the \Rpackage{lumi} package:
+<<load_data, message=FALSE>>=
+library(lumi)  # Required to access LumiBatch objects
+datapath <- "~/Downloads/sop_data.rda"
+load(datapath)
+@
+
+This is a typical data set from the Norwegian Women and Cancer study. These are
+anonymized data that are freely available from the UiT Dataverse \url{https://opendata.uit.no/}. The reference is \textit{Einar Holsbø, 2017, "Supporting data for "A Standard Operating Procedure for Outlier Removal in Large-Sample Epidemiological Transcriptomics Datasets"", doi:10.18710/FGVLKS, UiT Open Research Data Dataverse, DRAFT VERSION.}
+
+\subsection{Remove blood type probes}
+In some situations we remove 38 probes related to genes in the
+human leukocyte antigen (HLA) system. These are usually expressed strongly and
+have high variance, which affects multivariate analyses. Specifically we
+have seen that they might dominate the variance-covariance pattern in the PCA
+transformation of the data, and as such other patterns might be obscured.
+The \Rfunction{blood\_probes} function returns the
+nuIDs of these probes.
+<<names and hist>>=
+gene_expression <- gene_expression[!rownames(gene_expression) %in% blood_probes(), ]
+@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%      OUTLIER REMOVAL
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Outlier detection}\label{section:outliers}
+We find outliers by exploratory plotting and statistical measurements
+described more closely in the package documentation. We will be working on
+$log_2$-transformed
+data to ameliorate the higher variance we usually see for higher intensities and
+to make the expression levels more symmetrical.
+
+First we examine PCA-transformed data. The contour lines show distance to the
+center of the data in number of standard deviations.
+
+<<PCA>>=
+expression <- log2(t(exprs(gene_expression))) # transpose for samples by probes
+prc_all <- prcout(expression)
+plot(prc_all)
+@
+
+The points marked in red are three or more standard deviations away from the
+main bulk of the data: they look quite astonishing. Let's keep these red points as
+possible outliers.
+
+<<pcaoutliers>>=
+pca_outliers <- predict(prc_all, sdev=3)
+pca_outliers
+@
+
+
+Next we investigate some boxplots.
+<<boxplot_nowaclean>>=
+boxo <- boxout(expression)
+plot(boxo)
+@
+
+Points on the lines in this plot represent the box and whiskers of the regular
+\Rfunction{boxplot} function for your arrays. The lines represent the first and
+third quartiles, the median (ie the standard box), and the most extreme
+points that fall within 1.5 times the interquartile range (ie the whiskers/fences).
+As default the arrays are sorted by size of ks statistic (distance to pooled empirical distribution
+function).The red line demarks the cutoff for outlier or not.
+<<get_outliers_boxout>>=
+boxplot_outliers <- predict(boxo, sdev=3)
+boxplot_outliers
+@
+
+The final detection method we use is the MA-plot. Let's plot the worst candidates
+ and compare to some random samples. Badness is here defined in terms of mutual information between M and A statistics.
+<<maplot>>=
+maout <- mapout(expression)
+plot(maout, nout=5, lineup=T)
+
+mapoutliers <- predict(maout, sdev=3)
+mapoutliers
+@
+
+Let's now combine all outlier vectors.
+<<outlier_intersect>>=
+outliers <- unique(c(mapoutliers, boxplot_outliers, pca_outliers))
+outliers
+@
+
+These are the densities of expression values for all samples, proposed outliers in
+red:
+<<densplot>>=
+densities <- dens(expression)
+plot(densities, highlight=outliers)
+@
+
+As we can see, all of the clearly strange densities in this plot are marked as outliers;
+some of the candidates look fine however.
+
+\section{Outlier removal}\label{section:removal}
+So now we have a list of \Sexpr{length(outliers)} candidate outliers that we
+suspect are technical outliers. This section will examine each of them and
+we'll make a decision to either keep or remove them as need be. Note that I would usually
+use the actual sample names instead of indexing the outlier vector with numbers. This is to
+be absolutely certain that I'm looking at what I think I'm looking at. I suggest
+others do the same. However, these data are anonyimzed, there are no
+sample names, and strings of row numbers will have to do.
+
+\subsection{76}
+This one looks fine. Maybe the MA plot is the reason it got flagged. I won't
+remove this.
+<<outl1>>=
+highlight("76", pca=prc_all, box=boxo, dens=densities, ma=maout)
+@
+
+\subsection{122}
+This one is clearly very strange in all the plots, I will remove this.
+<<outl2>>=
+highlight("122", pca=prc_all, box=boxo, dens=densities, ma=maout)
+for_removal <- "122"
+@
+
+\subsection{323}
+<<outl3>>=
+highlight("323", pca=prc_all, box=boxo, dens=densities, ma=maout)
+@
+This one looks fine as well. Again it's probably the slightly high MI statistic.
+
+\subsection{511}
+This one once again looks strange in all the plots (maybe not all that bad in the MA plot)
+and I will take it out.
+<<outl4>>=
+highlight("511", pca=prc_all, box=boxo, dens=densities, ma=maout)
+for_removal <- c(for_removal, "511")
+@
+
+\subsection{827}
+<<outl5>>=
+highlight("827", pca=prc_all, box=boxo, dens=densities, ma=maout)
+for_removal <- c(for_removal, "827")
+@
+
+Our most extreme point yet! Not only are the intensities pushed all the way to the right,
+there seems also to be some slight bimodality and other strangeness that the healthy
+samples don't exhibit.
+
+\subsection{177}
+<<highlight6>>=
+highlight("177", pca=prc_all, box=boxo, dens=densities, ma=maout)
+@
+
+This one is more interesting, it's out there but not clearly broken. It looks as
+though the boxplots flagged it as outlier. Let's look at the lab info:
+<<rando6>>=
+lab_info["177", ]
+lab_thresholds
+@
+
+It's not outside the predefined thresholds. Let's keep it.
+
+
+\subsection{496}
+<<hihglight7>>=
+highlight("496", pca=prc_all, box=boxo, dens=densities, ma=maout)
+lab_info["496", ]
+lab_thresholds
+@
+
+This one is also slightly strange but not exactly outside the thresholds, so I'll keep it.
+
+\subsection{547}
+<<highlight8>>=
+highlight("547", pca=prc_all, box=boxo, dens=densities, ma=maout)
+lab_info["547", ]
+
+for_removal <- c(for_removal, "547")
+@
+
+This one is strange in three out of four plots and has a too-low 260/230 ratio.
+
+
+\section{Summary}
+<<ouliers_summary>>=
+for_removal
+@
+In the end we have four technical outliers. It's the ones you immediately feel
+strange about in the PCA plot:
+
+<<PCA_last>>=
+plot(prc_all, highlight=for_removal)
+@
+
+\section{Session info}
+<<session_info, echo=FALSE, results="asis">>=
+toLatex(sessionInfo())
+@
+\end{document}
