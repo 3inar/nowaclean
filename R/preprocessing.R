@@ -50,7 +50,7 @@ corrected <- function(data, negative_controls) {
   negative = names(which(apply(expr, 2, min) < 0))
   if(length(negative > 0)){
     stop("Found samples with negative gene expression values. Please investigate samples: ",
-         paste(unlist(negative), collapse=""), ".")
+         paste(unlist(negative), collapse=" "), ".")
   }
 
 
